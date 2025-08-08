@@ -25,6 +25,41 @@
     text-shadow: 0 2px 6px rgba(0,0,0,0.3);
   }
 
+  /* Fade-in animation */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  #about, .letters {
+    animation: fadeInUp 0.6s ease forwards;
+  }
+
+  #about {
+    max-width: 600px;
+    margin: 0 auto 30px auto;
+    color: #ddd;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  #about p em {
+    display: block;
+    margin-top: 12px;
+    font-style: italic;
+  }
+
+  #about p strong {
+    display: block;
+    margin-top: 8px;
+  }
+
   form {
     background: #2c2c54;
     padding: 25px;
@@ -77,12 +112,16 @@
     color: white;
     cursor: pointer;
     box-shadow: 0 6px 12px rgba(255,111,145,0.6);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
   }
 
   button:hover {
     background: #ff3d68;
     box-shadow: 0 8px 16px rgba(255,61,104,0.8);
+  }
+
+  button:active {
+    transform: scale(0.96);
   }
 
   .letters {
@@ -133,6 +172,13 @@
 
 <h1>Anonymous Letters</h1>
 
+<section id="about">
+  <p>Welcome! This site lets you write and share letters anonymously or signed. It’s perfect for honest thoughts, secret messages, or just random notes.</p>
+  <p>Feel free to write your letter and read others. All messages are stored locally on your device and won’t be shared externally.</p>
+  <p><em>jk, feel free to share thoughts everyone!</em></p>
+  <p><strong>PS.</strong> iykyk this is for ;)</p>
+</section>
+
 <form id="letterForm">
   <textarea id="letterBody" placeholder="Write your letter here..." required></textarea>
   <label><input type="checkbox" id="anonymous" checked /> Send anonymously</label>
@@ -145,7 +191,7 @@
   <div id="lettersList"></div>
 </div>
 
-<footer>by planetvenus</footer>
+<footer>signed, planetvenus</footer>
 
 <script>
   const form = document.getElementById('letterForm');
@@ -205,4 +251,4 @@
 
 </body>
   </html>
-  
+           
