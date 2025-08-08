@@ -5,18 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Anonymous Letters</title>
 <style>
-<footer style="text-align:center; font-size:0.8rem; color:#999; margin: 30px 0 10px 0; user-select:none; opacity:0.6;">
-  by planetvenus
-</footer>
-  body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
-  h1 { text-align: center; }
-  form { max-width: 600px; margin: 20px auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
-  textarea { width: 100%; height: 120px; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; resize: vertical; }
-  button { background: #007bff; color: white; border: none; padding: 10px 15px; font-size: 1rem; border-radius: 4px; cursor: pointer; margin-top: 10px; }
-  button:hover { background: #0056b3; }
-  .letters { max-width: 600px; margin: 30px auto; }
-  .letter { background: white; padding: 10px 15px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.1); white-space: pre-wrap; }
-  .meta { font-size: 0.8rem; color: #666; margin-bottom: 8px; }
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Montserrat', sans-serif;
+    color: #f0f0f5;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+
+  form {
+    background: #2c2c54;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width: 600px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  textarea {
+    width: 100%;
+    height: 130px;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    resize: vertical;
+    outline: none;
+    font-family: 'Montserrat', sans-serif;
+    box-sizing: border-box;
+  }
+
+  label {
+    display: block;
+    margin-top: 12px;
+    font-weight: 600;
+    user-select: none;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  button {
+    margin-top: 18px;
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    background: #ff6f91;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 12px rgba(255,111,145,0.6);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  button:hover {
+    background: #ff3d68;
+    box-shadow: 0 8px 16px rgba(255,61,104,0.8);
+  }
+
+  .letters {
+    max-width: 600px;
+    width: 100%;
+    margin-top: 40px;
+    background: #1e1e3f;
+    border-radius: 14px;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  }
+
+  .letter {
+    background: #3a3a72;
+    padding: 15px 20px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+    white-space: pre-wrap;
+    color: #f0f0f5;
+  }
+
+  .meta {
+    font-size: 0.8rem;
+    color: #d3d3d3;
+    margin-bottom: 8px;
+    user-select: none;
+  }
+
+  footer {
+    margin-top: auto;
+    padding: 15px 0;
+    color: #bbb;
+    font-size: 0.8rem;
+    text-align: center;
+    user-select: none;
+  }
+
+  /* Disable name input when anonymous checked */
+  #fromName:disabled {
+    background: #555577;
+    color: #aaa;
+  }
 </style>
 </head>
 <body>
@@ -25,10 +135,8 @@
 
 <form id="letterForm">
   <textarea id="letterBody" placeholder="Write your letter here..." required></textarea>
-  <br />
   <label><input type="checkbox" id="anonymous" checked /> Send anonymously</label>
-  <br />
-  <input type="text" id="fromName" placeholder="Your name (optional)" style="width:100%; margin-top:8px; padding:6px; font-size:1rem; border:1px solid #ccc; border-radius:4px;" />
+  <input type="text" id="fromName" placeholder="Your name (optional)" />
   <button type="submit">Send Letter</button>
 </form>
 
@@ -36,6 +144,8 @@
   <h2>Letters</h2>
   <div id="lettersList"></div>
 </div>
+
+<footer>by planetvenus</footer>
 
 <script>
   const form = document.getElementById('letterForm');
@@ -79,6 +189,7 @@
     renderLetters();
     form.reset();
     anonymousCheckbox.checked = true;
+    fromNameInput.disabled = true;
   });
 
   // Disable fromName if anonymous is checked
@@ -89,7 +200,9 @@
 
   // Initial render
   renderLetters();
+  fromNameInput.disabled = true;
 </script>
 
 </body>
-</html>
+  </html>
+  
