@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Anonymous Letters</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+  h1 { text-align: center; }
+  form { max-width: 600px; margin: 20px auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+  textarea { width: 100%; height: 120px; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; resize: vertical; }
+  button { background: #007bff; color: white; border: none; padding: 10px 15px; font-size: 1rem; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+  button:hover { background: #0056b3; }
+  .letters { max-width: 600px; margin: 30px auto; }
+  .letter { background: white; padding: 10px 15px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 0 6px rgba(0,0,0,0.1); white-space: pre-wrap; }
+  .meta { font-size: 0.8rem; color: #666; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<h1>Anonymous Letters</h1>
+
+<form id="letterForm">
+  <textarea id="letterBody" placeholder="Write your letter here..." required></textarea>
+  <br />
+  <label><input type="checkbox" id="anonymous" checked /> Send anonymously</label>
+  <br />
+  <input type="text" id="fromName" placeholder="Your name (optional)" style="width:100%; margin-top:8px; padding:6px; font-size:1rem; border:1px solid #ccc; border-radius:4px;" />
+  <button type="submit">Send Letter</button>
+</form>
+
+<div class="letters" id="lettersContainer">
+  <h2>Letters</h2>
+  <div id="lettersList"></div>
+</div>
+
+<script>
+  const form = document.getElementById('letterForm');
+  const lettersList = document.getElementById('lettersList');
+  const anonymousCheckbox = document.getElementById('anonymous');
+  const fromNameInput = document.getElementById('fromName');
+
+  function saveLetters(letters) {
+    localStorage.setItem('anonLetters', JSON.stringify(letters));
+  }
+
+  function loadLetters() {
+    const data = localStorage.getItem('anonLetters');
+    return data ? JSON.parse(data) : [];
+  }
+
+  function renderLetters() {
+    const letters = loadLetters();
+    lettersList.innerHTML = letters.length ? letters.map(l => `
+      <div class="letter">
+        <div class="meta">From: ${l.anonymous ? 'Anonymous' : l.fromName || '(No Name)'} | Sent: ${new Date(l.date).toLocaleString()}</div>
+        <div>${l.body.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+      </div>
+    `).join('') : '<p>No letters yet. Be the first!</p>';
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const body = document.getElementById('letterBody').value.trim();
+    if (!body) return alert('Write something before sending!');
+
+    const letters = loadLetters();
+    letters.unshift({
+      body,
+      anonymous: anonymousCheckbox.checked,
+      fromName: fromNameInput.value.trim(),
+      date: new Date().toISOString(),
+    });
+
+    saveLetters(letters);
+    renderLetters();
+    form.reset();
+    anonymousCheckbox.checked = true;
+  });
+
+  // Disable fromName if anonymous is checked
+  anonymousCheckbox.addEventListener('change', () => {
+    fromNameInput.disabled = anonymousCheckbox.checked;
+    if (anonymousCheckbox.checked) fromNameInput.value = '';
+  });
+
+  // Initial render
+  renderLetters();
+</script>
+
+</body>
+</html>
