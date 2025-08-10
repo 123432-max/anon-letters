@@ -212,23 +212,35 @@
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 1.1rem;
-    color: var(--text-color);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+    color: var(--text-color);
+    transition: color 0.3s ease;
     padding: 4px 8px;
     border-radius: 6px;
-    transition: background-color 0.2s ease;
   }
-
   .react-btn:hover {
     background-color: rgba(100, 100, 100, 0.1);
   }
-
-  .react-btn:focus {
-    outline: none;
-    box-shadow: 0 0 2px 2px var(--button-bg);
+  .react-btn .icon {
+    stroke: currentColor;
+    fill: none;
+    transition: fill 0.3s ease, stroke 0.3s ease;
+  }
+  .react-btn.active .icon {
+    fill: currentColor;
+    stroke: currentColor;
+  }
+  /* Different colors for active states */
+  .react-btn[data-type="like"].active {
+    color: #3b82f6; /* blue */
+  }
+  .react-btn[data-type="love"].active {
+    color: #e0245e; /* pink/red */
+  }
+  .react-btn[data-type="laugh"].active {
+    color: #facc15; /* yellow */
   }
 
   /* Letter Modal tweaks */
@@ -240,6 +252,7 @@
     color: var(--text-color);
     padding: 20px 25px;
     border-radius: 10px;
+    white-space: pre-wrap;
   }
 </style>
 </head>
@@ -298,7 +311,7 @@
   <div class="popup-content" id="letterModalContent">
     <span id="closeLetterModal" class="close-btn">&times;</span>
     <div id="letterDetailMeta"></div>
-    <div id="letterDetailBody" style="white-space: pre-wrap; margin-top: 10px;"></div>
+    <div id="letterDetailBody"></div>
   </div>
 </div>
 
@@ -351,150 +364,166 @@
             <div class="meta">From: ${data.anonymous ? "Anonymous" : data.fromName || "(No name)"} | Sent: ${new Date(data.date.seconds * 1000).toLocaleString()}</div>
             <div>${escapeHTML(data.body)}</div>
             <div class="reactions">
-              <button class="react-btn" data-type="like">👍 <span class="count">${data.likes || 0}</span></button>
-              <button class="react-btn" data-type="love">❤️ <span class="count">${data.loves || 0}</span></button>
+              <button class="react-btn" data-type="like" aria-label="Like" title="Like">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                  <path d="M14 9l-2 2-2-2"></path>
+                  <path d="M7 9v12h10V9"></path>
+                  <path d="M12 3v6"></path>
+                </svg>
+                <span class="count">${data.likes || 0}</span>
+              </button>
+              <button class="react-btn" data-type="love" aria-label="Love" title="Love">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                <span class="count">${data.loves || 0}</span>
+              </button>
+              <button class="react-btn" data-type="laugh" aria-label="Laugh" title="Laugh">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                  <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                  <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+                <span class="count">${data.laughs || 0}</span>
+              </button>
             </div>
           </div>
         `;
       }).join("");
-    } catch (err) {
+
+    } catch (e) {
       lettersList.innerHTML = "<p>Error loading letters.</p>";
-      console.error(err);
+      console.error(e);
     }
   }
-
-  anonymousCheckbox.addEventListener("change", () => {
-    fromNameInput.disabled = anonymousCheckbox.checked;
-    if (anonymousCheckbox.checked) {
-      fromNameInput.value = "";
-    }
-  });
 
   form.addEventListener("submit", async e => {
     e.preventDefault();
-    const body = document.getElementById("letterBody").value.trim();
-    if (!body) {
-      alert("Please write something before sending!");
+    const body = form.letterBody.value.trim();
+    if (!body) return alert("Write something first!");
+
+    const anonymous = anonymousCheckbox.checked;
+    const fromName = anonymous ? null : form.fromName.value.trim() || null;
+    const publicShare = publicShareCheckbox.checked;
+
+    if (!publicShare) {
+      alert("Currently, only public letters are supported.");
       return;
     }
-    const letterObj = {
-      body,
-      anonymous: anonymousCheckbox.checked,
-      fromName: fromNameInput.value.trim(),
-      date: new Date(),
-      public: publicShareCheckbox.checked,
-      likes: 0,
-      loves: 0
-    };
 
-    if (letterObj.public) {
-      try {
-        await addDoc(collection(db, "publicLetters"), letterObj);
-      } catch (err) {
-        alert("Error sharing publicly. Try again later.");
-        console.error(err);
-        return;
-      }
-    } else {
-      alert("Only public letters are saved in this version.");
+    try {
+      await addDoc(collection(db, "publicLetters"), {
+        body,
+        anonymous,
+        fromName,
+        date: new Date(),
+        likes: 0,
+        loves: 0,
+        laughs: 0,
+      });
+      form.reset();
+      fromNameInput.disabled = true;
+      await renderLetters();
+    } catch (err) {
+      alert("Error sending letter.");
+      console.error(err);
     }
-
-    form.reset();
-    anonymousCheckbox.checked = true;
-    fromNameInput.disabled = true;
-    publicShareCheckbox.checked = false;
-
-    renderLetters();
   });
 
+  anonymousCheckbox.addEventListener("change", () => {
+    fromNameInput.disabled = anonymousCheckbox.checked;
+    if (anonymousCheckbox.checked) fromNameInput.value = "";
+  });
+
+  // Reaction button clicks
   lettersList.addEventListener("click", async e => {
-    if (e.target.closest(".react-btn")) {
-      const btn = e.target.closest(".react-btn");
-      const letterDiv = btn.closest(".letter");
-      const letterId = letterDiv.getAttribute("data-id");
-      const reactionType = btn.getAttribute("data-type");
+    const btn = e.target.closest(".react-btn");
+    if (!btn) return;
 
-      const docRef = doc(db, "publicLetters", letterId);
-      try {
-        await updateDoc(docRef, {
-          [reactionType + "s"]: increment(1)
-        });
-      } catch (err) {
-        // If fails, fallback to merge set
-        await setDoc(docRef, { [reactionType + "s"]: 1 }, { merge: true });
-      }
-      renderLetters();
-      return; // important: don't open modal when reacting
+    const letterDiv = btn.closest(".letter");
+    if (!letterDiv) return;
+
+    const letterId = letterDiv.dataset.id;
+    const reactionType = btn.dataset.type;
+
+    // Toggle active class locally
+    btn.classList.toggle("active");
+
+    // Update Firestore count atomically
+    try {
+      const letterRef = doc(db, "publicLetters", letterId);
+      await updateDoc(letterRef, {
+        [reactionType + "s"]: increment(1)
+      });
+      await renderLetters();
+    } catch (err) {
+      console.error("Failed to update reaction:", err);
     }
+  });
 
-    // Open letter modal if clicked on letter (but not reaction buttons)
+  // Dark mode toggle
+  const darkModeToggle = document.getElementById("darkModeToggle");
+  darkModeToggle.addEventListener("change", () => {
+    document.body.classList.toggle("dark-mode", darkModeToggle.checked);
+  });
+
+  // About popup
+  const aboutModal = document.getElementById("aboutModal");
+  const aboutLink = document.getElementById("aboutLink");
+  const closeModalBtn = document.getElementById("closeModal");
+
+  aboutLink.addEventListener("click", () => {
+    aboutModal.style.display = "flex";
+  });
+  closeModalBtn.addEventListener("click", () => {
+    aboutModal.style.display = "none";
+  });
+  window.addEventListener("click", e => {
+    if (e.target === aboutModal) aboutModal.style.display = "none";
+  });
+
+  // Letter detail popup
+  const letterModal = document.getElementById("letterModal");
+  const closeLetterModalBtn = document.getElementById("closeLetterModal");
+  const letterDetailMeta = document.getElementById("letterDetailMeta");
+  const letterDetailBody = document.getElementById("letterDetailBody");
+
+  lettersList.addEventListener("click", e => {
+    if (e.target.closest(".react-btn")) return; // prevent modal open when clicking react
+
     const letterDiv = e.target.closest(".letter");
     if (!letterDiv) return;
 
-    const fromText = letterDiv.querySelector(".meta")?.textContent || "Unknown sender";
-    const bodyText = letterDiv.querySelector("div:not(.meta):not(.reactions)")?.textContent || "";
+    const letterId = letterDiv.dataset.id;
+    // Fetch letter data from Firestore
+    (async () => {
+      try {
+        const docSnap = await getDocs(query(collection(db, "publicLetters"), orderBy("date", "desc"), limit(50)));
+        const letterDoc = docSnap.docs.find(doc => doc.id === letterId);
+        if (!letterDoc) return;
 
-    letterDetailMeta.textContent = fromText;
-    letterDetailBody.textContent = bodyText;
+        const data = letterDoc.data();
+        letterDetailMeta.textContent = `From: ${data.anonymous ? "Anonymous" : data.fromName || "(No name)"} | Sent: ${new Date(data.date.seconds * 1000).toLocaleString()}`;
+        letterDetailBody.textContent = data.body;
 
-    letterModal.style.display = "flex";
+        letterModal.style.display = "flex";
+      } catch (err) {
+        console.error(err);
+      }
+    })();
   });
 
-  renderLetters();
-
-  const aboutLink = document.getElementById("aboutLink");
-  const aboutModal = document.getElementById("aboutModal");
-  const closeModal = document.getElementById("closeModal");
-
-  aboutLink.addEventListener("click", e => {
-    e.preventDefault();
-    aboutModal.style.display = "flex";
+  closeLetterModalBtn.addEventListener("click", () => {
+    letterModal.style.display = "none";
   });
-
-  closeModal.addEventListener("click", () => {
-    aboutModal.style.display = "none";
-  });
-
   window.addEventListener("click", e => {
-    if (e.target === aboutModal) {
-      aboutModal.style.display = "none";
-    } else if (e.target === letterModal) {
-      letterModal.style.display = "none";
-    }
+    if (e.target === letterModal) letterModal.style.display = "none";
   });
 
-  // Dark mode toggle logic
-  const darkModeToggle = document.getElementById("darkModeToggle");
-
-  // Load saved preference
-  if (localStorage.getItem("darkMode") === "enabled") {
-    document.body.classList.add("dark-mode");
-    darkModeToggle.checked = true;
-  }
-
-  darkModeToggle.addEventListener("change", () => {
-    if (darkModeToggle.checked) {
-      document.body.classList.add("dark-mode");
-      localStorage.setItem("darkMode", "enabled");
-    } else {
-      document.body.classList.remove("dark-mode");
-      localStorage.setItem("darkMode", "disabled");
-    }
-  });
+  // Initialize
+  fromNameInput.disabled = anonymousCheckbox.checked;
+  renderLetters();
 </script>
-
-<!-- Live Chat Widget -->
-<script type="text/javascript">
-  var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-  (function(){
-    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-    s1.async=true;
-    s1.src='https://embed.tawk.to/1j28voj20/default';
-    s1.charset='UTF-8';
-    s1.setAttribute('crossorigin','*');
-    s0.parentNode.insertBefore(s1,s0);
-  })();
-</script>
-
 </body>
 </html>
