@@ -334,6 +334,20 @@ footer {
   text-align: center;
   margin-top: 1rem;
 }
+  #viewAllLettersBtn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #1db954;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+#viewAllLettersBtn:hover {
+  background-color: #17a344;
+}
 
 /* Responsive */
 @media (max-width: 600px) {
@@ -382,17 +396,7 @@ footer {
     <h2>Public Letters</h2>
     <div id="lettersSection">
   <div id="lettersList"></div>
-  <button id="viewAllLettersBtn" style="
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    border: none;
-    background-color: #2db954;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  ">View All Letters</button>
+  <button id="viewAllLettersBtn" style="margin-top: 1rem; /* other styles */">Letter Box</button>
       <!-- Archive Modal -->
 <div id="archiveModal">
   <button id="closeArchiveBtn">&times;</button>
