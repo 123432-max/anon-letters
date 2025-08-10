@@ -279,103 +279,22 @@ footer {
   main {
     margin: 10px;
   }
-nav {
-        display: none;
-      }
-
-      #menuToggle {
-        display: block;
-        cursor: pointer;
-        font-size: 28px;
-        color: var(--header-text);
-        user-select: none;
-      }
-    }
-
-    /* Sidebar container */
-    #sidebar {
-      position: fixed;
-      top: 0;
-      left: -260px; /* hidden */
-      width: 250px;
-      height: 100vh;
-      background-color: var(--header-bg);
-      color: var(--header-text);
-      padding: 60px 20px 20px;
-      box-sizing: border-box;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.2);
-      transition: left 0.3s ease;
-      z-index: 1100;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* Sidebar visible */
-    #sidebar.active {
-      left: 0;
-    }
-
-    /* Sidebar links */
-    #sidebar a {
-      color: var(--header-text);
-      font-weight: 600;
-      font-size: 1.2rem;
-      text-decoration: none;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      cursor: pointer;
-    }
-
-    /* Close button inside sidebar */
-    #sidebarClose {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 28px;
-      cursor: pointer;
-      user-select: none;
-      color: var(--header-text);
-    }
-
-    /* Overlay behind sidebar */
-    #sidebarOverlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.3);
-      z-index: 1050;
-    }
-
-    /* Show overlay when sidebar active */
-    #sidebarOverlay.active {
-      display: block;
-    }
+}
 </style>
 </head>
 <body>
 
 <header>
   <h1>Anonymous Letters</h1>
-
-  <!-- Hamburger menu icon for mobile -->
-  <div id="menuToggle" aria-label="Open menu" tabindex="0">&#9776;</div>
-
   <nav>
     <a href="#submitSection">Home</a>
     <a href="#chatSection">Chat</a>
     <a id="aboutLink">About</a>
   </nav>
+  <label id="darkModeToggleLabel" for="darkModeToggle">Dark Mode
+    <input type="checkbox" id="darkModeToggle" />
+  </label>
 </header>
-
-<!-- Sidebar for mobile nav (place this just after header, inside <body>) -->
-<div id="sidebar" role="navigation" aria-label="Mobile menu">
-  <div id="sidebarClose" aria-label="Close menu" tabindex="0">&times;</div>
-  <a href="#submitSection" class="sidebar-link">Home</a>
-  <a href="#chatSection" class="sidebar-link">Chat</a>
-  <a id="sidebarAboutLink" class="sidebar-link">About</a>
-</div>
-<div id="sidebarOverlay"></div>
 
 <main>
   <section id="submitSection">
@@ -439,58 +358,6 @@ nav {
 </div>
 
 <script type="module">
-  const menuToggle = document.getElementById("menuToggle");
-const sidebar = document.getElementById("sidebar");
-const sidebarClose = document.getElementById("sidebarClose");
-const sidebarOverlay = document.getElementById("sidebarOverlay");
-const sidebarAboutLink = document.getElementById("sidebarAboutLink");
-const chatSection = document.getElementById("chatSection");
-const aboutModal = document.getElementById("aboutModal");
-
-// Function to toggle sidebar
-function toggleSidebar(show) {
-  if(show) {
-    sidebar.classList.add("active");
-    sidebarOverlay.classList.add("active");
-  } else {
-    sidebar.classList.remove("active");
-    sidebarOverlay.classList.remove("active");
-  }
-}
-
-// Open sidebar on hamburger click
-menuToggle.addEventListener("click", () => toggleSidebar(true));
-menuToggle.addEventListener("keydown", e => { if(e.key === "Enter") toggleSidebar(true); });
-
-// Close sidebar on close button or overlay click
-sidebarClose.addEventListener("click", () => toggleSidebar(false));
-sidebarClose.addEventListener("keydown", e => { if(e.key === "Enter") toggleSidebar(false); });
-sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
-
-// Sidebar link click behavior
-sidebar.querySelectorAll(".sidebar-link").forEach(link => {
-  link.addEventListener("click", e => {
-    e.preventDefault();
-    const href = link.getAttribute("href");
-    toggleSidebar(false);
-    if(href === "#chatSection") {
-      chatSection.style.display = "block";
-      window.location.hash = "#chatSection";
-    } else if (href === "#submitSection" || href === "#lettersSection") {
-      chatSection.style.display = "none";
-      window.location.hash = href;
-      document.querySelector(href).scrollIntoView({ behavior: "smooth" });
-    }
-  });
-});
-
-// Sidebar About link opens About modal too
-sidebarAboutLink.addEventListener("click", e => {
-  e.preventDefault();
-  toggleSidebar(false);
-  aboutModal.style.display = "flex";
-});
-
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { 
     getFirestore, collection, addDoc, query, orderBy, limit, getDocs,
