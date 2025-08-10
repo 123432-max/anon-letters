@@ -439,58 +439,6 @@ nav {
 </div>
 
 <script type="module">
-  const menuToggle = document.getElementById("menuToggle");
-const sidebar = document.getElementById("sidebar");
-const sidebarClose = document.getElementById("sidebarClose");
-const sidebarOverlay = document.getElementById("sidebarOverlay");
-const sidebarAboutLink = document.getElementById("sidebarAboutLink");
-const chatSection = document.getElementById("chatSection");
-const aboutModal = document.getElementById("aboutModal");
-
-// Function to toggle sidebar
-function toggleSidebar(show) {
-  if(show) {
-    sidebar.classList.add("active");
-    sidebarOverlay.classList.add("active");
-  } else {
-    sidebar.classList.remove("active");
-    sidebarOverlay.classList.remove("active");
-  }
-}
-
-// Open sidebar on hamburger click
-menuToggle.addEventListener("click", () => toggleSidebar(true));
-menuToggle.addEventListener("keydown", e => { if(e.key === "Enter") toggleSidebar(true); });
-
-// Close sidebar on close button or overlay click
-sidebarClose.addEventListener("click", () => toggleSidebar(false));
-sidebarClose.addEventListener("keydown", e => { if(e.key === "Enter") toggleSidebar(false); });
-sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
-
-// Sidebar link click behavior
-sidebar.querySelectorAll(".sidebar-link").forEach(link => {
-  link.addEventListener("click", e => {
-    e.preventDefault();
-    const href = link.getAttribute("href");
-    toggleSidebar(false);
-    if(href === "#chatSection") {
-      chatSection.style.display = "block";
-      window.location.hash = "#chatSection";
-    } else if (href === "#submitSection" || href === "#lettersSection") {
-      chatSection.style.display = "none";
-      window.location.hash = href;
-      document.querySelector(href).scrollIntoView({ behavior: "smooth" });
-    }
-  });
-});
-
-// Sidebar About link opens About modal too
-sidebarAboutLink.addEventListener("click", e => {
-  e.preventDefault();
-  toggleSidebar(false);
-  aboutModal.style.display = "flex";
-});
-
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { 
     getFirestore, collection, addDoc, query, orderBy, limit, getDocs,
@@ -773,7 +721,53 @@ sidebarAboutLink.addEventListener("click", e => {
     chatSection.style.display = "block";
   }
 
-</script>
+  // --- SIDEBAR MENU TOGGLE LOGIC ---
 
+  const menuToggle = document.getElementById("menuToggle");
+  const sidebar = document.getElementById("sidebar");
+  const sidebarClose = document.getElementById("sidebarClose");
+  const sidebarOverlay = document.getElementById("sidebarOverlay");
+  const sidebarAboutLink = document.getElementById("sidebarAboutLink");
+
+  function toggleSidebar(show) {
+    if (show) {
+      sidebar.classList.add("active");
+      sidebarOverlay.classList.add("active");
+    } else {
+      sidebar.classList.remove("active");
+      sidebarOverlay.classList.remove("active");
+    }
+  }
+
+  menuToggle.addEventListener("click", () => toggleSidebar(true));
+  menuToggle.addEventListener("keydown", e => { if(e.key === "Enter") toggleSidebar(true); });
+
+  sidebarClose.addEventListener("click", () => toggleSidebar(false));
+  sidebarClose.addEventListener("keydown", e => { if(e.key === "Enter") toggleSidebar(false); });
+  sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
+
+  sidebar.querySelectorAll(".sidebar-link").forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      const href = link.getAttribute("href");
+      toggleSidebar(false);
+      if(href === "#chatSection") {
+        chatSection.style.display = "block";
+        window.location.hash = "#chatSection";
+      } else if (href === "#submitSection" || href === "#lettersSection") {
+        chatSection.style.display = "none";
+        window.location.hash = href;
+        document.querySelector(href).scrollIntoView({ behavior: "smooth" });
+      }
+    });
+  });
+
+  sidebarAboutLink.addEventListener("click", e => {
+    e.preventDefault();
+    toggleSidebar(false);
+    aboutModal.style.display = "flex";
+  });
+
+</script>
 </body>
 </html>
