@@ -135,6 +135,7 @@
     border-radius: 8px;
     margin-top: 15px;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    cursor: pointer;
   }
   .meta {
     font-size: 12px;
@@ -199,6 +200,47 @@
     margin-left: 8px;
     cursor: pointer;
   }
+
+  /* Reactions */
+  .reactions {
+    margin-top: 8px;
+    display: flex;
+    gap: 15px;
+  }
+
+  .react-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+  }
+
+  .react-btn:hover {
+    background-color: rgba(100, 100, 100, 0.1);
+  }
+
+  .react-btn:focus {
+    outline: none;
+    box-shadow: 0 0 2px 2px var(--button-bg);
+  }
+
+  /* Letter Modal tweaks */
+  #letterModalContent {
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: var(--popup-content-bg);
+    color: var(--text-color);
+    padding: 20px 25px;
+    border-radius: 10px;
+  }
 </style>
 </head>
 <body>
@@ -251,10 +293,22 @@
   </div>
 </div>
 
+<!-- Letter Detail Modal -->
+<div class="popup" id="letterModal">
+  <div class="popup-content" id="letterModalContent">
+    <span id="closeLetterModal" class="close-btn">&times;</span>
+    <div id="letterDetailMeta"></div>
+    <div id="letterDetailBody" style="white-space: pre-wrap; margin-top: 10px;"></div>
+  </div>
+</div>
+
 <!-- Firebase SDKs -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { 
+    getFirestore, collection, addDoc, query, orderBy, limit, getDocs,
+    doc, updateDoc, setDoc, increment
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBKoB-MttFzBvxONoG8mHWvxQyAJCHH2kU",
@@ -275,6 +329,10 @@
   const fromNameInput = document.getElementById("fromName");
   const publicShareCheckbox = document.getElementById("publicShare");
 
+  function escapeHTML(str) {
+    return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
   async function renderLetters() {
     lettersList.innerHTML = "<p>Loading letters...</p>";
     try {
@@ -286,12 +344,16 @@
         return;
       }
 
-      lettersList.innerHTML = querySnapshot.docs.map(doc => {
-        const data = doc.data();
+      lettersList.innerHTML = querySnapshot.docs.map(docSnap => {
+        const data = docSnap.data();
         return `
-          <div class="letter">
+          <div class="letter" data-id="${docSnap.id}">
             <div class="meta">From: ${data.anonymous ? "Anonymous" : data.fromName || "(No name)"} | Sent: ${new Date(data.date.seconds * 1000).toLocaleString()}</div>
             <div>${escapeHTML(data.body)}</div>
+            <div class="reactions">
+              <button class="react-btn" data-type="like">👍 <span class="count">${data.likes || 0}</span></button>
+              <button class="react-btn" data-type="love">❤️ <span class="count">${data.loves || 0}</span></button>
+            </div>
           </div>
         `;
       }).join("");
@@ -299,10 +361,6 @@
       lettersList.innerHTML = "<p>Error loading letters.</p>";
       console.error(err);
     }
-  }
-
-  function escapeHTML(str) {
-    return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
   anonymousCheckbox.addEventListener("change", () => {
@@ -325,6 +383,8 @@
       fromName: fromNameInput.value.trim(),
       date: new Date(),
       public: publicShareCheckbox.checked,
+      likes: 0,
+      loves: 0
     };
 
     if (letterObj.public) {
@@ -347,6 +407,39 @@
     renderLetters();
   });
 
+  lettersList.addEventListener("click", async e => {
+    if (e.target.closest(".react-btn")) {
+      const btn = e.target.closest(".react-btn");
+      const letterDiv = btn.closest(".letter");
+      const letterId = letterDiv.getAttribute("data-id");
+      const reactionType = btn.getAttribute("data-type");
+
+      const docRef = doc(db, "publicLetters", letterId);
+      try {
+        await updateDoc(docRef, {
+          [reactionType + "s"]: increment(1)
+        });
+      } catch (err) {
+        // If fails, fallback to merge set
+        await setDoc(docRef, { [reactionType + "s"]: 1 }, { merge: true });
+      }
+      renderLetters();
+      return; // important: don't open modal when reacting
+    }
+
+    // Open letter modal if clicked on letter (but not reaction buttons)
+    const letterDiv = e.target.closest(".letter");
+    if (!letterDiv) return;
+
+    const fromText = letterDiv.querySelector(".meta")?.textContent || "Unknown sender";
+    const bodyText = letterDiv.querySelector("div:not(.meta):not(.reactions)")?.textContent || "";
+
+    letterDetailMeta.textContent = fromText;
+    letterDetailBody.textContent = bodyText;
+
+    letterModal.style.display = "flex";
+  });
+
   renderLetters();
 
   const aboutLink = document.getElementById("aboutLink");
@@ -365,6 +458,8 @@
   window.addEventListener("click", e => {
     if (e.target === aboutModal) {
       aboutModal.style.display = "none";
+    } else if (e.target === letterModal) {
+      letterModal.style.display = "none";
     }
   });
 
