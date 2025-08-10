@@ -864,7 +864,7 @@ function renderArchivePage(page = 1) {
   archiveLettersList.innerHTML = "";
   const start = (page - 1) * lettersPerPage;
   const end = start + lettersPerPage;
-  const pageLetters = allLetters.slice(start, end);
+  const pageLetters = allPublicLetters.slice(start, end);
 
   if (pageLetters.length === 0) {
     archiveLettersList.innerHTML = "<p>No letters found.</p>";
@@ -884,7 +884,7 @@ function renderArchivePage(page = 1) {
   });
 
   // Pagination buttons
-  const totalPages = Math.ceil(allLetters.length / lettersPerPage);
+  const totalPages = Math.ceil(allPublicLetters.length / lettersPerPage);
   let paginationHTML = "";
   if (page > 1) paginationHTML += `<button id="prevPageBtn" style="margin-right:10px; padding: 0.3rem 0.7rem;">Previous</button>`;
   if (page < totalPages) paginationHTML += `<button id="nextPageBtn" style="padding: 0.3rem 0.7rem;">Next</button>`;
