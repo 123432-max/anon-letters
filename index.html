@@ -280,12 +280,53 @@ footer {
     margin: 10px;
   }
 }
+  /* Hamburger button hidden on desktop */
+#menuToggle {
+  display: none;
+  font-size: 28px;
+  background: transparent;
+  border: none;
+  color: var(--header-text, #fff);
+  cursor: pointer;
+  padding: 0 15px;
+}
+
+/* Mobile styling */
+@media (max-width: 600px) {
+  nav {
+    display: none;
+    flex-direction: column;
+    background: var(--header-bg, #222);
+    position: absolute;
+    top: 56px; /* Adjust based on your header height */
+    right: 0;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+  }
+  nav.show {
+    display: flex;
+  }
+  nav a {
+    padding: 12px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--header-text, #fff);
+    text-decoration: none;
+  }
+  nav a:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  #menuToggle {
+    display: block;
+  }
+}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Anonymous Letters</h1>
+  <h1>Signed Anon</h1>
+  <button id="menuToggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
   <nav>
     <a href="#submitSection">Home</a>
     <a href="#chatSection">Chat</a>
@@ -639,6 +680,15 @@ footer {
   if(window.location.hash === "#chatSection") {
     chatSection.style.display = "block";
   }
+  const menuToggle = document.getElementById("menuToggle");
+const nav = document.querySelector("header nav");
+
+menuToggle.addEventListener("click", () => {
+  const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
+  menuToggle.setAttribute("aria-expanded", String(!isExpanded));
+  nav.classList.toggle("show");
+});
+
 
 </script>
 
