@@ -1,462 +1,646 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Signed Anonymous Letters</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg-color: #fef6f9;
-      --text-color: #3b3a4f;
-      --header-bg: #a8dadc;
-      --header-text: #1d3557;
-      --button-bg: #ffb4a2;
-      --button-hover-bg: #ff8a75;
-      --link-color: #1d3557;
-      --link-hover-color: #457b9d;
-      --letter-bg: #ffffff;
-      --letter-text: #3b3a4f;
-      --footer-text: #7e7f9a;
-      --meta-text: #6c757d;
-      --popup-bg: rgba(200, 200, 200, 0.3);
-      --popup-content-bg: #ffffff;
-      --shadow-light: rgba(0, 0, 0, 0.1);
-    }
-    body {
-      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    body.dark-mode {
-      --bg-color: #2f3e46;
-      --text-color: #d8e2dc;
-      --header-bg: #354f52;
-      --header-text: #f0efeb;
-      --button-bg: #84a98c;
-      --button-hover-bg: #52796f;
-      --link-color: #f0efeb;
-      --link-hover-color: #cad2c5;
-      --letter-bg: #52796f;
-      --letter-text: #f0efeb;
-      --footer-text: #a7c4bc;
-      --meta-text: #b6c1ba;
-      --popup-bg: rgba(0, 0, 0, 0.7);
-      --popup-content-bg: #354f52;
-      --shadow-light: rgba(255, 255, 255, 0.1);
-    }
-    header {
-      width: 100%;
-      background-color: var(--header-bg);
-      color: var(--header-text);
-      padding: 20px 25px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      box-shadow: 0 2px 8px var(--shadow-light);
-      z-index: 10;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-    }
-    nav {
-      display: flex;
-      gap: 25px;
-      font-weight: 600;
-      font-size: 1rem;
-    }
-    nav a {
-      color: var(--link-color);
-      text-decoration: none;
-      cursor: pointer;
-      position: relative;
-      padding-bottom: 3px;
-      transition: color 0.3s ease;
-    }
-    nav a::after {
-      content: "";
-      position: absolute;
-      width: 0%;
-      height: 2px;
-      bottom: 0;
-      left: 0;
-      background-color: var(--link-hover-color);
-      transition: width 0.3s ease;
-    }
-    nav a:hover,
-    nav a:focus {
-      color: var(--link-hover-color);
-    }
-    nav a:hover::after,
-    nav a:focus::after {
-      width: 100%;
-    }
-    #darkModeToggleLabel {
-      color: var(--header-text);
-      cursor: pointer;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
-    }
-    #darkModeToggle {
-      cursor: pointer;
-      width: 18px;
-      height: 18px;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Anonymous Letters + Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-color: #f0f2f5;
+    --text-color: #333;
+    --header-bg: #4caf50;
+    --header-text: white;
+    --button-bg: #4caf50;
+    --button-hover-bg: #45a049;
+    --link-color: white;
+    --link-hover-color: #c8f7c5;
+    --letter-bg: white;
+    --letter-text: #333;
+    --footer-text: #666;
+    --meta-text: #555;
+    --popup-bg: rgba(0,0,0,0.5);
+    --popup-content-bg: white;
+  }
+  body.dark-mode {
+    --bg-color: #121212;
+    --text-color: #ddd;
+    --header-bg: #222;
+    --header-text: #eee;
+    --button-bg: #333;
+    --button-hover-bg: #555;
+    --link-color: #eee;
+    --link-hover-color: #7ddb7d;
+    --letter-bg: #1e1e1e;
+    --letter-text: #ddd;
+    --footer-text: #aaa;
+    --meta-text: #aaa;
+    --popup-bg: rgba(0,0,0,0.8);
+    --popup-content-bg: #2a2a2a;
+  }
+  body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    width: 100%;
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+  nav {
+    display: flex;
+    gap: 20px;
+  }
+  nav a {
+    color: var(--link-color);
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+  nav a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+  }
+  #darkModeToggleLabel {
+    color: var(--header-text);
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #darkModeToggle {
+    cursor: pointer;
+  }
+  main {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 0 15px 50px;
+  }
+  section {
+    margin-bottom: 50px;
+  }
+  h2 {
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+  textarea, input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: var(--bg-color);
+    color: var(--text-color);
+    resize: none;
+  }
+  label {
+    display: block;
+    margin-top: 12px;
+  }
+  button {
+    background: var(--button-bg);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  button:hover {
+    background-color: var(--button-hover-bg);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  .letter {
+    background: var(--letter-bg);
+    color: var(--letter-text);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+  }
+  .meta {
+    font-size: 12px;
+    color: var(--meta-text);
+    margin-bottom: 8px;
+  }
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--footer-text);
+    margin: 20px 0 40px;
+  }
+  /* Reactions */
+  .reactions {
+    margin-top: 8px;
+    display: flex;
+    gap: 15px;
+  }
+  .react-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .react-btn:hover {
+    background-color: rgba(100, 100, 100, 0.1);
+  }
+  .react-btn .icon {
+    stroke: currentColor;
+    fill: none;
+    transition: fill 0.3s ease, stroke 0.3s ease;
+  }
+  .react-btn.active .icon {
+    fill: currentColor;
+    stroke: currentColor;
+  }
+  .react-btn[data-type="like"].active {
+    color: #3b82f6; /* blue */
+  }
+  .react-btn[data-type="love"].active {
+    color: #e0245e; /* pink/red */
+  }
+  .react-btn[data-type="laugh"].active {
+    color: #facc15; /* yellow */
+  }
+  /* Popup styling */
+  .popup {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--popup-bg);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .popup-content {
+    background: var(--popup-content-bg);
+    padding: 20px 25px;
+    border-radius: 10px;
+    max-width: 400px;
+    box-sizing: border-box;
+    position: relative;
+    color: var(--text-color);
+  }
+  .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+  }
+  .close-btn:hover {
+    color: #000;
+  }
+  #letterModalContent {
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+  /* Chat */
+  #chatMessages {
+    max-height: 300px;
+    overflow-y: auto;
+    background: var(--letter-bg);
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+    font-size: 14px;
+    color: var(--text-color);
+  }
+  .chat-message {
+    margin-bottom: 10px;
+  }
+  .chat-message .sender {
+    font-weight: 600;
+  }
+  .chat-input-group {
+    display: flex;
+    margin-top: 10px;
+  }
+  #chatInput {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 8px 0 0 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background: var(--bg-color);
+    color: var(--text-color);
+  }
+  #chatSendBtn {
+    padding: 10px 18px;
+    border: none;
+    background: var(--button-bg);
+    color: white;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  #chatSendBtn:hover {
+    background-color: var(--button-hover-bg);
+  }
+  /* Hide public letters message if none */
+  #lettersList p {
+    margin-top: 15px;
+    color: var(--meta-text);
+  }
+  /* Responsive */
+  @media (max-width: 600px) {
     main {
-      max-width: 720px;
-      margin: 30px auto 60px;
-      padding: 0 20px;
+      margin: 10px;
     }
-    section {
-      margin-bottom: 60px;
-    }
-    h2 {
-      margin-bottom: 20px;
-      font-weight: 700;
-      color: var(--header-text);
-      font-size: 1.4rem;
-    }
-    textarea,
-    input[type="text"] {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 14px 18px;
-      font-size: 15px;
-      border-radius: 14px;
-      border: 1.8px solid #d1d1e9;
-      background: var(--letter-bg);
-      color: var(--text-color);
-      resize: vertical;
-      transition: border-color 0.3s ease;
-      font-weight: 400;
-    }
-    textarea:focus,
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--button-bg);
-      box-shadow: 0 0 8px var(--button-bg);
-    }
-    label {
-      display: block;
-      margin-top: 14px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--meta-text);
-    }
-    button {
-      background: var(--button-bg);
-      color: white;
-      padding: 14px 28px;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: 700;
-      margin-top: 16px;
-      box-shadow: 0 4px 12px var(--button-bg);
-      transition: background-color 0.3s ease, transform 0.22s ease, box-shadow 0.22s ease;
-      user-select: none;
-    }
-    button:hover,
-    button:focus {
-      background-color: var(--button-hover-bg);
-      transform: scale(1.07);
-      box-shadow: 0 6px 16px var(--button-hover-bg);
-    }
-    .letter {
-      background: var(--letter-bg);
-      color: var(--letter-text);
-      padding: 20px 25px;
-      border-radius: 18px;
-      margin-top: 22px;
-      box-shadow: 0 8px 15px var(--shadow-light);
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.25s ease;
-      white-space: pre-wrap;
-      user-select: text;
-    }
-    .letter:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 20px var(--shadow-light);
-    }
-    .meta {
-      font-size: 12.5px;
-      color: var(--meta-text);
-      margin-bottom: 10px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-    }
-    footer {
-      text-align: center;
-      font-size: 13px;
-      color: var(--footer-text);
-      margin: 30px 0 50px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      user-select: none;
-      border-top: 1.5px solid #eee;
-      padding-top: 18px;
-    }
-    /* Popup styling */
-    .popup {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: var(--popup-bg);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .popup-content {
-      background: var(--popup-content-bg);
-      padding: 24px 32px;
-      border-radius: 18px;
-      max-width: 460px;
-      box-sizing: border-box;
-      position: relative;
-      color: var(--text-color);
-      font-weight: 500;
-      box-shadow: 0 15px 35px var(--shadow-light);
-      max-height: 75vh;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      font-size: 16px;
-      line-height: 1.5;
-      letter-spacing: 0.02em;
-    }
-    .close-btn {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      font-size: 26px;
-      font-weight: 900;
-      color: #aaa;
-      cursor: pointer;
-      user-select: none;
-      transition: color 0.3s ease;
-    }
-    .close-btn:hover {
-      color: var(--button-bg);
-    }
-    /* Responsive tweaks */
-    @media (max-width: 480px) {
-      main {
-        margin: 20px 15px 40px;
-      }
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 16px 20px;
-      }
-      nav {
-        gap: 15px;
-        font-size: 0.9rem;
-      }
-      button {
-        padding: 12px 24px;
-      }
-      .letter {
-        padding: 16px 20px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>Signed Anonymous Letters</h1>
-    <nav>
-      <a href="#submitSection" id="homeLink">Home</a>
-      <a href="#chatSection" id="chatLink">Chat</a>
-      <a href="#" id="aboutLink">About</a>
-    </nav>
-    <label id="darkModeToggleLabel" for="darkModeToggle">
-      Dark Mode
-      <input type="checkbox" id="darkModeToggle" />
-    </label>
-  </header>
 
-  <main>
-    <section id="submitSection">
-      <h2>Send a Letter</h2>
-      <form id="letterForm">
-        <label for="fromName">Your name (optional):</label>
-        <input type="text" id="fromName" placeholder="Your name" />
+<header>
+  <h1>Anonymous Letters</h1>
+  <nav>
+    <a href="#submitSection">Home</a>
+    <a href="#chatSection">Chat</a>
+    <a id="aboutLink">About</a>
+  </nav>
+  <label id="darkModeToggleLabel" for="darkModeToggle">Dark Mode
+    <input type="checkbox" id="darkModeToggle" />
+  </label>
+</header>
 
-        <label>
-          <input type="checkbox" id="anonymousCheckbox" />
-          Send anonymously
-        </label>
+<main>
+  <section id="submitSection">
+    <h2>Send a Letter</h2>
+    <form id="letterForm">
+      <textarea id="letterBody" placeholder="Write your letter..."></textarea>
+      
+      <label>
+        <input type="checkbox" id="anonymous" checked /> Send anonymously
+      </label>
+      
+      <label for="fromName">Your name (optional):</label>
+      <input type="text" id="fromName" placeholder="Your name here" disabled />
+      
+      <label>
+        <input type="checkbox" id="publicShare" checked /> Share publicly
+      </label>
+      
+      <button type="submit">Send Letter</button>
+    </form>
+  </section>
 
-        <label for="body">Letter body:</label>
-        <textarea id="body" rows="5" placeholder="Write your letter here..." required></textarea>
-
-        <label>
-          <input type="checkbox" id="publicShareCheckbox" checked />
-          Share publicly
-        </label>
-
-        <button type="submit">Send Letter</button>
-        <p style="margin-top:12px; font-style: italic; color: var(--meta-text);">
-          jk feel free to share thoughts everyone!<br />
-          <small>ps. iykyk this is for ;)</small>
-        </p>
-      </form>
-    </section>
-
-    <section id="lettersSection">
-      <h2>Public Letters</h2>
-      <div id="lettersList"></div>
-    </section>
-
-    <section id="chatSection" style="display:none;">
-      <h2>Community Chat</h2>
-      <div id="chatMessages"></div>
-      <div class="chat-input-group">
-        <textarea id="chatInput" rows="2" placeholder="Say something..."></textarea>
-        <button id="chatSendBtn">Send</button>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    by planetvenus
-  </footer>
-
-  <!-- About Modal -->
-  <div class="popup" id="aboutModal">
-    <div class="popup-content">
-      <span class="close-btn" id="closeModal">&times;</span>
-      <h3>About This Site</h3>
-      <p>This is a minimal anonymous letter sharing site, designed for easy and safe expression.</p>
-      <p>Created as a project with community features, reactions, and dark mode.</p>
-      <p>Enjoy! &mdash; planetvenus</p>
+  <section id="lettersSection">
+    <h2>Public Letters</h2>
+    <div id="lettersList">
+      <p>No letters yet. Be the first!</p>
     </div>
-  </div>
+  </section>
 
-  <!-- Letter Detail Modal -->
-  <div class="popup" id="letterModal">
-    <div class="popup-content" id="letterModalContent">
-      <span class="close-btn" id="closeLetterModal">&times;</span>
-      <div id="letterDetailMeta" class="meta"></div>
+  <section id="chatSection" style="display:none;">
+    <h2>Community Chat Room</h2>
+    <div id="chatMessages"></div>
+    <div class="chat-input-group">
+      <input type="text" id="chatInput" placeholder="Type your message..." />
+      <button id="chatSendBtn">Send</button>
     </div>
+  </section>
+</main>
+
+<footer>
+  by planetvenus — jk feel free to share thoughts everyone!<br />
+  <small>ps. iykyk this is for ;)</small>
+</footer>
+
+<!-- About popup -->
+<div class="popup" id="aboutModal">
+  <div class="popup-content">
+    <span id="closeModal" class="close-btn">&times;</span>
+    <h2>About This Site</h2>
+    <p>This is a safe space for sharing anonymous or public letters and chatting with the community. Be kind, respectful, and have fun.</p>
   </div>
+</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-    import { getDatabase, ref, onChildAdded, push } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
+<!-- Letter Detail Modal -->
+<div class="popup" id="letterModal">
+  <div class="popup-content" id="letterModalContentWrapper">
+    <span id="closeLetterModal" class="close-btn">&times;</span>
+    <div id="letterDetailMeta"></div>
+    <div id="letterDetailBody"></div>
+  </div>
+</div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBKoB-MttFzBvxONoG8mHWvxQyAJCHH2kU",
-      authDomain: "signed-anon.firebaseapp.com",
-      projectId: "signed-anon",
-      storageBucket: "signed-anon.firebasestorage.app",
-      messagingSenderId: "786490639449",
-      appId: "1:786490639449:web:cbc7a80e9b0cb0d6141d48",
-      measurementId: "G-W6WH1KD5YQ"
-    };
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { 
+    getFirestore, collection, addDoc, query, orderBy, limit, getDocs,
+    doc, updateDoc, increment
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+  import {
+    getDatabase, ref, push, onChildAdded, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    const lettersRef = ref(db, 'letters');
-    const lettersList = document.getElementById('lettersList');
+  const firebaseConfig = {
+    apiKey: "AIzaSyBKoB-MttFzBvxONoG8mHWvxQyAJCHH2kU",
+    authDomain: "signed-anon.firebaseapp.com",
+    projectId: "signed-anon",
+    storageBucket: "signed-anon.firebasestorage.app",
+    messagingSenderId: "786490639449",
+    appId: "1:786490639449:web:cbc7a80e9b0cb0d6141d48",
+    measurementId: "G-W6WH1KD5YQ"
+  };
 
-    // Form elements
-    const letterForm = document.getElementById('letterForm');
-    const fromNameInput = document.getElementById('fromName');
-    const anonymousCheckbox = document.getElementById('anonymousCheckbox');
-    const bodyInput = document.getElementById('body');
-    const publicShareCheckbox = document.getElementById('publicShareCheckbox');
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const realtimeDb = getDatabase(app);
 
-    // Modals
-    const aboutModal = document.getElementById('aboutModal');
-    const aboutLink = document.getElementById('aboutLink');
-    const closeModalBtn = document.getElementById('closeModal');
+  const form = document.getElementById("letterForm");
+  const lettersList = document.getElementById("lettersList");
+  const anonymousCheckbox = document.getElementById("anonymous");
+  const fromNameInput = document.getElementById("fromName");
+  const publicShareCheckbox = document.getElementById("publicShare");
 
-    const letterModal = document.getElementById('letterModal');
-    const letterModalContent = document.getElementById('letterModalContent');
-    const closeLetterModalBtn = document.getElementById('closeLetterModal');
-    const letterDetailMeta = document.getElementById('letterDetailMeta');
+  const chatSection = document.getElementById("chatSection");
+  const chatMessages = document.getElementById("chatMessages");
+  const chatInput = document.getElementById("chatInput");
+  const chatSendBtn = document.getElementById("chatSendBtn");
 
-    // Dark mode toggle
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if(localStorage.getItem('darkMode') === 'enabled') {
-      document.body.classList.add('dark-mode');
-      darkModeToggle.checked = true;
+  function escapeHTML(str) {
+    return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render letters - public only
+  async function renderLetters() {
+    lettersList.innerHTML = "<p>Loading letters...</p>";
+    try {
+      const q = query(collection(db, "publicLetters"), orderBy("date", "desc"), limit(50));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        lettersList.innerHTML = "<p>No letters yet. Be the first!</p>";
+        return;
+      }
+
+      lettersList.innerHTML = querySnapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        return `
+          <div class="letter" data-id="${docSnap.id}">
+            <div class="meta">From: ${data.anonymous ? "Anonymous" : escapeHTML(data.fromName || "(No name)")} | Sent: ${new Date(data.date.seconds * 1000).toLocaleString()}</div>
+            <div>${escapeHTML(data.body)}</div>
+            <div class="reactions">
+              <button class="react-btn" data-type="like" aria-label="Like" title="Like">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                  <path d="M14 9l-2 2-2-2"></path>
+                  <path d="M7 9v12h10V9"></path>
+                  <path d="M12 3v6"></path>
+                </svg>
+                <span class="count">${data.likes || 0}</span>
+              </button>
+              <button class="react-btn" data-type="love" aria-label="Love" title="Love">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                <span class="count">${data.loves || 0}</span>
+              </button>
+              <button class="react-btn" data-type="laugh" aria-label="Laugh" title="Laugh">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                  <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                  <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+                <span class="count">${data.laughs || 0}</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+    } catch (e) {
+      lettersList.innerHTML = "<p>Error loading letters.</p>";
+      console.error(e);
     }
+  }
 
-    darkModeToggle.addEventListener('change', () => {
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
-    });
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const body = form.letterBody.value.trim();
+    if (!body) return alert("Write something first!");
 
-    // About modal open/close
-    aboutLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      aboutModal.style.display = 'flex';
-    });
-    closeModalBtn.addEventListener('click', () => {
-      aboutModal.style.display = 'none';
-    });
-    window.addEventListener('click', e => {
-      if (e.target === aboutModal) aboutModal.style.display = 'none';
-      if (e.target === letterModal) letterModal.style.display = 'none';
-    });
+    const anonymous = anonymousCheckbox.checked;
+    const fromName = anonymous ? null : form.fromName.value.trim() || null;
+    const publicShare = publicShareCheckbox.checked;
 
-    // Listen for letters
-    onChildAdded(lettersRef, (snapshot) => {
-      const letter = snapshot.val();
-      if (!letter.public) return; // Only show public letters
+    try {
+      if (publicShare) {
+        await addDoc(collection(db, "publicLetters"), {
+          body,
+          anonymous,
+          fromName,
+          date: new Date(),
+          likes: 0,
+          loves: 0,
+          laughs: 0,
+        });
+      } else {
+        // Save private letters in Firestore 'privateLetters' (won't show publicly)
+        await addDoc(collection(db, "privateLetters"), {
+          body,
+          anonymous,
+          fromName,
+          date: new Date()
+        });
+        alert("Your letter is saved privately.");
+      }
+      form.reset();
+      fromNameInput.disabled = true;
+      publicShareCheckbox.checked = true;
+      await renderLetters();
+    } catch (err) {
+      alert("Error sending letter.");
+      console.error(err);
+    }
+  });
 
-      const letterDiv = document.createElement('div');
-      letterDiv.className = 'letter';
-      letterDiv.textContent = letter.body.length > 120 ? letter.body.slice(0, 120) + '...' : letter.body;
+  anonymousCheckbox.addEventListener("change", () => {
+    fromNameInput.disabled = anonymousCheckbox.checked;
+    if (anonymousCheckbox.checked) fromNameInput.value = "";
+  });
 
-      letterDiv.addEventListener('click', () => {
-        letterModal.style.display = 'flex';
-        letterModalContent.textContent = letter.body;
-        letterDetailMeta.textContent = `From: ${letter.anonymous ? 'Anonymous' : (letter.fromName || 'Unknown')}`;
+  // Reaction button clicks
+  lettersList.addEventListener("click", async e => {
+    const btn = e.target.closest(".react-btn");
+    if (!btn) return;
+
+    const letterDiv = btn.closest(".letter");
+    if (!letterDiv) return;
+
+    const letterId = letterDiv.dataset.id;
+    const reactionType = btn.dataset.type;
+
+    btn.classList.toggle("active");
+
+    try {
+      const letterRef = doc(db, "publicLetters", letterId);
+      await updateDoc(letterRef, {
+        [reactionType + "s"]: increment(1)
       });
+      await renderLetters();
+    } catch (err) {
+      console.error("Failed to update reaction:", err);
+    }
+  });
 
-      lettersList.appendChild(letterDiv);
+  // Dark mode toggle
+  const darkModeToggle = document.getElementById("darkModeToggle");
+  darkModeToggle.addEventListener("change", () => {
+    document.body.classList.toggle("dark-mode", darkModeToggle.checked);
+  });
+
+  // About popup
+  const aboutModal = document.getElementById("aboutModal");
+  const aboutLink = document.getElementById("aboutLink");
+  const closeModalBtn = document.getElementById("closeModal");
+
+  aboutLink.addEventListener("click", () => {
+    aboutModal.style.display = "flex";
+  });
+  closeModalBtn.addEventListener("click", () => {
+    aboutModal.style.display = "none";
+  });
+  window.addEventListener("click", e => {
+    if (e.target === aboutModal) aboutModal.style.display = "none";
+  });
+
+  // Letter detail popup
+  const letterModal = document.getElementById("letterModal");
+  const closeLetterModalBtn = document.getElementById("closeLetterModal");
+  const letterDetailMeta = document.getElementById("letterDetailMeta");
+  const letterDetailBody = document.getElementById("letterDetailBody");
+
+  lettersList.addEventListener("click", e => {
+    if (e.target.closest(".react-btn")) return; // prevent modal open when clicking react
+
+    const letterDiv = e.target.closest(".letter");
+    if (!letterDiv) return;
+
+    const letterId = letterDiv.dataset.id;
+
+    (async () => {
+      try {
+        const docSnap = await getDocs(query(collection(db, "publicLetters"), orderBy("date", "desc"), limit(50)));
+        const letterDoc = docSnap.docs.find(doc => doc.id === letterId);
+        if (!letterDoc) return;
+
+        const data = letterDoc.data();
+        letterDetailMeta.textContent = `From: ${data.anonymous ? "Anonymous" : data.fromName || "(No name)"} | Sent: ${new Date(data.date.seconds * 1000).toLocaleString()}`;
+        letterDetailBody.textContent = data.body;
+
+        letterModal.style.display = "flex";
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  });
+
+  closeLetterModalBtn.addEventListener("click", () => {
+    letterModal.style.display = "none";
+  });
+  window.addEventListener("click", e => {
+    if (e.target === letterModal) letterModal.style.display = "none";
+  });
+
+  // Chat room logic using Firebase Realtime Database
+  const chatRef = ref(realtimeDb, "chatMessages");
+  function addChatMessage(sender, message) {
+    push(chatRef, {
+      sender,
+      message,
+      timestamp: serverTimestamp()
     });
+  }
 
-    // Submit letter
-    letterForm.addEventListener('submit', e => {
+  chatSendBtn.addEventListener("click", () => {
+    const message = chatInput.value.trim();
+    if (!message) return;
+    const sender = anonymousCheckbox.checked ? "Anonymous" : (fromNameInput.value.trim() || "Guest");
+    addChatMessage(sender, message);
+    chatInput.value = "";
+  });
+
+  chatInput.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      const fromName = anonymousCheckbox.checked ? null : fromNameInput.value.trim();
-      const body = bodyInput.value.trim();
-      const isPublic = publicShareCheckbox.checked;
+      chatSendBtn.click();
+    }
+  });
 
-      if (!body) return alert('Please write a letter.');
+  onChildAdded(chatRef, snapshot => {
+    const data = snapshot.val();
+    if (!data) return;
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("chat-message");
+    const time = data.timestamp ? new Date(data.timestamp).toLocaleTimeString() : "";
+    msgDiv.innerHTML = `<span class="sender">${escapeHTML(data.sender)}:</span> ${escapeHTML(data.message)}`;
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
 
-      push(lettersRef, {
-        fromName: fromName || null,
-        anonymous: anonymousCheckbox.checked,
-        body,
-        public: isPublic,
-        timestamp: Date.now()
-      }).then(() => {
-        bodyInput.value = '';
-        fromNameInput.value = '';
-        anonymousCheckbox.checked = false;
-        publicShareCheckbox.checked = true;
-      }).catch(err => alert('Error sending letter: ' + err.message));
+  // Menu navigation logic for showing/hiding chat section
+  document.querySelectorAll("nav a").forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      const href = link.getAttribute("href");
+      if (href === "#chatSection") {
+        chatSection.style.display = "block";
+        window.location.hash = "#chatSection";
+      } else if (href === "#submitSection" || href === "#lettersSection") {
+        chatSection.style.display = "none";
+        window.location.hash = href;
+        // scroll smoothly to section
+        document.querySelector(href).scrollIntoView({ behavior: "smooth" });
+      }
     });
-  </script>
+  });
+
+  // Initial states
+  fromNameInput.disabled = anonymousCheckbox.checked;
+  renderLetters();
+
+  // If URL hash is chatSection, show chat
+  if(window.location.hash === "#chatSection") {
+    chatSection.style.display = "block";
+  }
+
+</script>
+
 </body>
 </html>
