@@ -4,10 +4,49 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Anonymous Letters</title>
+
+<!-- Google Fonts: Poppins -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
 <style>
+  :root {
+    --bg-color: #f0f2f5;
+    --text-color: #333;
+    --header-bg: #4caf50;
+    --header-text: white;
+    --button-bg: #4caf50;
+    --button-hover-bg: #45a049;
+    --link-color: white;
+    --link-hover-color: #c8f7c5;
+    --letter-bg: white;
+    --letter-text: #333;
+    --footer-text: #666;
+    --meta-text: #555;
+    --popup-bg: rgba(0,0,0,0.5);
+    --popup-content-bg: white;
+  }
+
+  body.dark-mode {
+    --bg-color: #121212;
+    --text-color: #ddd;
+    --header-bg: #222;
+    --header-text: #eee;
+    --button-bg: #333;
+    --button-hover-bg: #555;
+    --link-color: #eee;
+    --link-hover-color: #7ddb7d;
+    --letter-bg: #1e1e1e;
+    --letter-text: #ddd;
+    --footer-text: #aaa;
+    --meta-text: #aaa;
+    --popup-bg: rgba(0,0,0,0.8);
+    --popup-content-bg: #2a2a2a;
+  }
+
   body {
-    font-family: Arial, sans-serif;
-    background: #f0f2f5;
+    font-family: 'Poppins', Arial, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
     margin: 0;
     padding: 0;
     display: flex;
@@ -16,27 +55,37 @@
   }
   header {
     width: 100%;
-    background-color: #4caf50;
-    color: white;
+    background-color: var(--header-bg);
+    color: var(--header-text);
     padding: 15px 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
   }
   header h1 {
     margin: 0;
     font-size: 1.3rem;
+    flex-grow: 1;
   }
   nav a {
-    color: white;
+    color: var(--link-color);
     text-decoration: none;
     margin-left: 20px;
     cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  nav a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
   }
   main {
     max-width: 600px;
     width: 100%;
     padding: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.7s forwards ease-out;
+    animation-delay: 0.3s;
   }
   textarea {
     width: 100%;
@@ -47,6 +96,8 @@
     border-radius: 8px;
     resize: none;
     box-sizing: border-box;
+    color: var(--text-color);
+    background: var(--bg-color);
   }
   label {
     display: block;
@@ -58,9 +109,11 @@
     border-radius: 8px;
     border: 1px solid #ccc;
     box-sizing: border-box;
+    color: var(--text-color);
+    background: var(--bg-color);
   }
   button {
-    background: #4caf50;
+    background: var(--button-bg);
     color: white;
     padding: 12px 25px;
     border: none;
@@ -68,9 +121,16 @@
     cursor: pointer;
     font-weight: bold;
     margin-top: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  button:hover {
+    background-color: var(--button-hover-bg);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   }
   .letter {
-    background: white;
+    background: var(--letter-bg);
+    color: var(--letter-text);
     padding: 15px;
     border-radius: 8px;
     margin-top: 15px;
@@ -78,14 +138,14 @@
   }
   .meta {
     font-size: 12px;
-    color: #555;
+    color: var(--meta-text);
     margin-bottom: 8px;
   }
   footer {
     margin-top: 30px;
     margin-bottom: 15px;
     font-size: 12px;
-    color: #666;
+    color: var(--footer-text);
     text-align: center;
   }
   /* Popup styling */
@@ -93,13 +153,13 @@
     display: none;
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
+    background: var(--popup-bg);
     justify-content: center;
     align-items: center;
     z-index: 1000;
   }
   .popup-content {
-    background: white;
+    background: var(--popup-content-bg);
     padding: 20px 25px;
     border-radius: 10px;
     max-width: 400px;
@@ -118,6 +178,27 @@
   .close-btn:hover {
     color: #000;
   }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Dark mode toggle label */
+  #darkModeToggleLabel {
+    color: var(--header-text);
+    cursor: pointer;
+    margin-left: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+  #darkModeToggle {
+    margin-left: 8px;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
@@ -127,6 +208,9 @@
   <nav>
     <a id="aboutLink">About</a>
   </nav>
+  <label id="darkModeToggleLabel" for="darkModeToggle">Dark Mode
+    <input type="checkbox" id="darkModeToggle" />
+  </label>
 </header>
 
 <main>
@@ -281,6 +365,25 @@
   window.addEventListener("click", e => {
     if (e.target === aboutModal) {
       aboutModal.style.display = "none";
+    }
+  });
+
+  // Dark mode toggle logic
+  const darkModeToggle = document.getElementById("darkModeToggle");
+
+  // Load saved preference
+  if (localStorage.getItem("darkMode") === "enabled") {
+    document.body.classList.add("dark-mode");
+    darkModeToggle.checked = true;
+  }
+
+  darkModeToggle.addEventListener("change", () => {
+    if (darkModeToggle.checked) {
+      document.body.classList.add("dark-mode");
+      localStorage.setItem("darkMode", "enabled");
+    } else {
+      document.body.classList.remove("dark-mode");
+      localStorage.setItem("darkMode", "disabled");
     }
   });
 </script>
