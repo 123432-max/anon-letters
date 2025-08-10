@@ -320,6 +320,63 @@ footer {
     display: block;
   }
 }
+  /* Hide nav by default on mobile */
+nav {
+  position: fixed;
+  top: 0;
+  left: -250px; /* offscreen */
+  width: 250px;
+  height: 100vh;
+  background: var(--nav-bg, #f5f5dc); /* beige-ish default */
+  box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+  flex-direction: column;
+  padding-top: 60px; /* space for header/menu toggle */
+  transition: left 0.3s ease;
+  z-index: 10000;
+}
+
+/* When nav is shown */
+nav.show {
+  left: 0;
+}
+
+/* Links stacked */
+nav a {
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  color: var(--nav-text, #333);
+  text-decoration: none;
+}
+
+/* Dark mode for nav */
+body.dark-mode nav {
+  background: #222;
+}
+
+body.dark-mode nav a {
+  color: #eee;
+}
+
+/* Menu toggle button */
+#menuToggle {
+  display: block;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 11000;
+  background: var(--menu-bg, #fff);
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* Dark mode toggle switch inside nav */
+#darkModeToggle {
+  margin: 20px;
+}
+  
 </style>
 </head>
 <body>
@@ -328,13 +385,15 @@ footer {
   <h1>Signed Anon</h1>
   <button id="menuToggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
   <nav>
-    <a href="#submitSection">Home</a>
-    <a href="#chatSection">Chat</a>
-    <a id="aboutLink">About</a>
+    <a href="#submitSection" class="sidebar-link">Submit</a>
+    <a href="#lettersSection" class="sidebar-link">Letters</a>
+    <a href="#chatSection" class="sidebar-link">Chat</a>
+    <label for="darkModeToggle" style="margin: 20px; cursor: pointer;">
+      <input type="checkbox" id="darkModeToggle" />
+      Dark Mode
+    </label>
+    <a href="#aboutSection" id="aboutLink">About</a>
   </nav>
-  <label id="darkModeToggleLabel" for="darkModeToggle">Dark Mode
-    <input type="checkbox" id="darkModeToggle" />
-  </label>
 </header>
 
 <main>
@@ -681,14 +740,30 @@ footer {
     chatSection.style.display = "block";
   }
   const menuToggle = document.getElementById("menuToggle");
-const nav = document.querySelector("header nav");
+const nav = document.querySelector("nav");
+const darkModeToggle = document.getElementById("darkModeToggle");
 
+// Toggle sidebar menu on hamburger click
 menuToggle.addEventListener("click", () => {
   const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
   menuToggle.setAttribute("aria-expanded", String(!isExpanded));
   nav.classList.toggle("show");
 });
 
+// Toggle dark mode and close sidebar
+darkModeToggle.addEventListener("change", () => {
+  document.body.classList.toggle("dark-mode", darkModeToggle.checked);
+  nav.classList.remove("show"); // close sidebar on toggle
+  menuToggle.setAttribute("aria-expanded", "false");
+});
+
+// Close sidebar when clicking any nav link
+nav.querySelectorAll("a").forEach(link => {
+  link.addEventListener("click", () => {
+    nav.classList.remove("show");
+    menuToggle.setAttribute("aria-expanded", "false");
+  });
+});
 
 </script>
 
