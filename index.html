@@ -62,29 +62,38 @@ header h1 {
   font-size: 1.3rem;
 }
 nav {
-  display: flex;
-  gap: 20px;
+  position: fixed;
+  top: 0;
+  right: -250px; /* hide it offscreen to the right */
+  width: 250px;
+  height: 100vh;
+  background: #222;
+  color: white;
+  padding: 20px;
+  transition: right 0.3s ease;
+  z-index: 1000;
 }
+
+nav.show {
+  right: 0; /* slide in */
+}
+
 nav a {
-  color: var(--link-color);
+  display: block;
+  margin: 15px 0;
+  color: white;
   text-decoration: none;
-  cursor: pointer;
-  font-weight: 600;
-  transition: color 0.3s ease;
 }
-nav a:hover {
-  color: var(--link-hover-color);
-  text-decoration: underline;
-}
-#darkModeToggleLabel {
-  color: var(--header-text);
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-#darkModeToggle {
+
+#menuToggle {
+  position: fixed;
+  top: 15px;
+  right: 15px; /* keep toggle button visible on top-right */
+  z-index: 1100;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #222;
   cursor: pointer;
 }
 main {
