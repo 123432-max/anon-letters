@@ -395,17 +395,18 @@ footer {
   </section>
 
   <section id="lettersSection">
-    <h2>Public Letters</h2>
-    <button id="viewAllLettersBtn" style="margin-top: 1rem; /* other styles */">Letter Box</button>
+  <h2>Public Letters</h2>
+  <button id="viewAllLettersBtn" style="margin-top: 1rem;">Letter Box</button>
   <div id="lettersList"></div>
-      <!-- Archive Modal -->
-<div id="archiveModal">
-  <button id="closeArchiveBtn">&times;</button>
-  <h2>All Letters Archive</h2>
-  <div id="archiveLettersList"></div>
-  <div id="archivePagination"></div>
-</div>
-  </section>
+
+  <!-- Archive Modal -->
+  <div id="archiveModal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); overflow-y: auto; padding: 2rem; z-index: 1000; font-family: Arial, sans-serif;">
+    <button id="closeArchiveBtn" style="position: fixed; top: 1rem; right: 1rem; font-size: 2rem; background: none; border: none; color: white; cursor: pointer; line-height: 1;">&times;</button>
+    <h2 style="color: white; margin-bottom: 1rem;">All Letters Archive</h2>
+    <div id="archiveLettersList" style="background: #fff; padding: 1rem; border-radius: 8px; max-width: 700px; margin: auto;"></div>
+    <div id="archivePagination" style="text-align: center; margin-top: 1rem;"></div>
+  </div>
+</section>
 
   <section id="chatSection" style="display:none;">
     <h2>Community Chat Room</h2>
@@ -451,6 +452,10 @@ footer {
     getDatabase, ref, push, onChildAdded, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+let allPublicLetters = [];
+let currentPage = 1;  // for pagination in archive
+const lettersPerPage = 10;
+  
   const firebaseConfig = {
     apiKey: "AIzaSyBKoB-MttFzBvxONoG8mHWvxQyAJCHH2kU",
     authDomain: "signed-anon.firebaseapp.com",
@@ -480,58 +485,116 @@ footer {
     return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
-  // Render letters - public only
-  async function renderLetters() {
-    lettersList.innerHTML = "<p>Loading letters...</p>";
-    try {
-      const q = query(collection(db, "publicLetters"), orderBy("date", "desc"), limit(50));
-      const querySnapshot = await getDocs(q);
+  // Store all letters globally for archive use
+let allPublicLetters = [];
 
-      if (querySnapshot.empty) {
-        lettersList.innerHTML = "<p>No letters yet. Be the first!</p>";
-        return;
-      }
+async function renderLetters() {
+  lettersList.innerHTML = "<p>Loading letters...</p>";
+  try {
+    const q = query(collection(db, "publicLetters"), orderBy("date", "desc"), limit(50));
+    const querySnapshot = await getDocs(q);
 
-      lettersList.innerHTML = querySnapshot.docs.map(docSnap => {
-        const data = docSnap.data();
-        return `
-          <div class="letter" data-id="${docSnap.id}">
-            <div class="meta">From: ${data.anonymous ? "Anonymous" : escapeHTML(data.fromName || "(No name)")} | Sent: ${new Date(data.date.seconds * 1000).toLocaleString()}</div>
-            <div>${escapeHTML(data.body)}</div>
-            <div class="reactions">
-              <button class="react-btn" data-type="like" aria-label="Like" title="Like">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                  <path d="M14 9l-2 2-2-2"></path>
-                  <path d="M7 9v12h10V9"></path>
-                  <path d="M12 3v6"></path>
-                </svg>
-                <span class="count">${data.likes || 0}</span>
-              </button>
-              <button class="react-btn" data-type="love" aria-label="Love" title="Love">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-                <span class="count">${data.loves || 0}</span>
-              </button>
-              <button class="react-btn" data-type="laugh" aria-label="Laugh" title="Laugh">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                  <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                  <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                </svg>
-                <span class="count">${data.laughs || 0}</span>
-              </button>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-    } catch (e) {
-      lettersList.innerHTML = "<p>Error loading letters.</p>";
-      console.error(e);
+    if (querySnapshot.empty) {
+      lettersList.innerHTML = "<p>No letters yet. Be the first!</p>";
+      allPublicLetters = [];
+      return;
     }
+
+    // Save all letters data globally for archive modal
+    allPublicLetters = querySnapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
+
+    // Show only the 10 most recent letters here
+    const recentLetters = allPublicLetters.slice(0, 10);
+
+    lettersList.innerHTML = recentLetters.map(data => {
+      return `
+        <div class="letter" data-id="${data.id}">
+          <div class="meta">From: ${data.anonymous ? "Anonymous" : escapeHTML(data.fromName || "(No name)")} | Sent: ${new Date(data.date.seconds * 1000).toLocaleString()}</div>
+          <div>${escapeHTML(data.body)}</div>
+          <div class="reactions">
+            <button class="react-btn" data-type="like" aria-label="Like" title="Like">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <path d="M14 9l-2 2-2-2"></path>
+                <path d="M7 9v12h10V9"></path>
+                <path d="M12 3v6"></path>
+              </svg>
+              <span class="count">${data.likes || 0}</span>
+            </button>
+            <button class="react-btn" data-type="love" aria-label="Love" title="Love">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              <span class="count">${data.loves || 0}</span>
+            </button>
+            <button class="react-btn" data-type="laugh" aria-label="Laugh" title="Laugh">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                <line x1="15" y1="9" x2="15.01" y2="9"></line>
+              </svg>
+              <span class="count">${data.laughs || 0}</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+  } catch (e) {
+    lettersList.innerHTML = "<p>Error loading letters.</p>";
+    console.error(e);
   }
+}
+
+  function renderArchivePage(page) {
+  const archiveLettersList = document.getElementById("archiveLettersList");
+  const archivePagination = document.getElementById("archivePagination");
+
+  if (!allPublicLetters.length) {
+    archiveLettersList.innerHTML = "<p>No letters in archive.</p>";
+    archivePagination.innerHTML = "";
+    return;
+  }
+
+  const start = (page - 1) * lettersPerPage;
+  const end = start + lettersPerPage;
+  const lettersToShow = allPublicLetters.slice(start, end);
+
+  archiveLettersList.innerHTML = lettersToShow.map(data => {
+    return `
+      <div class="letter" data-id="${data.id}" style="margin-bottom: 1rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem;">
+        <div class="meta">From: ${data.anonymous ? "Anonymous" : escapeHTML(data.fromName || "(No name)")} | Sent: ${new Date(data.date.seconds * 1000).toLocaleString()}</div>
+        <div>${escapeHTML(data.body)}</div>
+      </div>
+    `;
+  }).join("");
+
+  // Pagination buttons
+  const totalPages = Math.ceil(allPublicLetters.length / lettersPerPage);
+  let paginationHTML = "";
+  if (page > 1) paginationHTML += `<button id="prevPageBtn" style="margin-right:10px; padding: 0.3rem 0.7rem;">Previous</button>`;
+  if (page < totalPages) paginationHTML += `<button id="nextPageBtn" style="padding: 0.3rem 0.7rem;">Next</button>`;
+  archivePagination.innerHTML = paginationHTML;
+
+  // Add event listeners for pagination buttons
+  const prevBtn = document.getElementById("prevPageBtn");
+  const nextBtn = document.getElementById("nextPageBtn");
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      currentPage--;
+      renderArchivePage(currentPage);
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      currentPage++;
+      renderArchivePage(currentPage);
+    });
+  }
+}
 
   form.addEventListener("submit", async e => {
     e.preventDefault();
@@ -622,6 +685,27 @@ footer {
   window.addEventListener("click", e => {
     if (e.target === aboutModal) aboutModal.style.display = "none";
   });
+
+const viewAllBtn = document.getElementById("viewAllLettersBtn");
+const archiveModal = document.getElementById("archiveModal");
+const closeArchiveBtn = document.getElementById("closeArchiveBtn");
+
+viewAllBtn.addEventListener("click", () => {
+  currentPage = 1;
+  renderArchivePage(currentPage);
+  archiveModal.style.display = "block";
+});
+
+closeArchiveBtn.addEventListener("click", () => {
+  archiveModal.style.display = "none";
+});
+
+// Close modal if clicking outside the modal content
+archiveModal.addEventListener("click", e => {
+  if (e.target === archiveModal) {
+    archiveModal.style.display = "none";
+  }
+});
 
   // Letter detail popup
   const letterModal = document.getElementById("letterModal");
