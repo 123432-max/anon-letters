@@ -563,14 +563,12 @@ async function renderLetters() {
   const end = start + lettersPerPage;
   const lettersToShow = allPublicLetters.slice(start, end);
 
-  archiveLettersList.innerHTML = lettersToShow.map(data => {
-    return `
-      <div class="letter" data-id="${data.id}" style="margin-bottom: 1rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem;">
-        <div class="meta">From: ${data.anonymous ? "Anonymous" : escapeHTML(data.fromName || "(No name)")} | Sent: ${new Date(data.date.seconds * 1000).toLocaleString()}</div>
-        <div>${escapeHTML(data.body)}</div>
-      </div>
-    `;
-  }).join("");
+  archiveLettersList.innerHTML = lettersToShow.map(data => `
+    <div class="letter" data-id="${data.id}" style="margin-bottom: 1rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem;">
+      <div class="meta">From: ${data.anonymous ? "Anonymous" : escapeHTML(data.fromName || "(No name)")} | Sent: ${new Date(data.date.seconds * 1000).toLocaleString()}</div>
+      <div>${escapeHTML(data.body)}</div>
+    </div>
+  `).join("");
 
   // Pagination buttons
   const totalPages = Math.ceil(allPublicLetters.length / lettersPerPage);
@@ -579,21 +577,17 @@ async function renderLetters() {
   if (page < totalPages) paginationHTML += `<button id="nextPageBtn" style="padding: 0.3rem 0.7rem;">Next</button>`;
   archivePagination.innerHTML = paginationHTML;
 
-  // Add event listeners for pagination buttons
   const prevBtn = document.getElementById("prevPageBtn");
   const nextBtn = document.getElementById("nextPageBtn");
-  if (prevBtn) {
-    prevBtn.addEventListener("click", () => {
-      currentPage--;
-      renderArchivePage(currentPage);
-    });
-  }
-  if (nextBtn) {
-    nextBtn.addEventListener("click", () => {
-      currentPage++;
-      renderArchivePage(currentPage);
-    });
-  }
+
+  if (prevBtn) prevBtn.addEventListener("click", () => {
+    currentPage--;
+    renderArchivePage(currentPage);
+  });
+  if (nextBtn) nextBtn.addEventListener("click", () => {
+    currentPage++;
+    renderArchivePage(currentPage);
+  });
 }
 
   form.addEventListener("submit", async e => {
@@ -853,13 +847,13 @@ const archivePagination = document.getElementById("archivePagination");
 
 const lettersPerPage = 10;
 let currentPage = 1;
-let allLetters = [];
+let allPublicLetters = [];
 
 async function loadAllLetters() {
   try {
     const q = query(collection(db, "publicLetters"), orderBy("date", "desc"));
     const querySnapshot = await getDocs(q);
-    allLetters = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    allPublicLetters = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
   } catch (error) {
     archiveLettersList.innerHTML = `<p style="color: red;">Failed to load letters.</p>`;
     console.error(error);
