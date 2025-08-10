@@ -717,6 +717,98 @@ footer {
 fromNameInput.disabled = anonymousCheckbox.checked;
 renderLetters();
 
+  let allPublicLetters = [];
+const lettersPerPage = 10;
+let currentPage = 1;
+
+async function loadLetters() {
+  try {
+    const q = query(collection(db, "publicLetters"), orderBy("date", "desc"), limit(50));
+    const querySnapshot = await getDocs(q);
+    allPublicLetters = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderRecentLetters();
+  } catch (e) {
+    document.getElementById("lettersList").innerHTML = "<p>Failed to load letters.</p>";
+    console.error(e);
+  }
+}
+
+function renderRecentLetters() {
+  const recent = allPublicLetters.slice(0, lettersPerPage);
+  const lettersList = document.getElementById("lettersList");
+  lettersList.innerHTML = recent.map(letter => `
+    <div class="letter" data-id="${letter.id}">
+      <div class="meta">From: ${letter.anonymous ? "Anonymous" : escapeHTML(letter.fromName || "(No name)")} | Sent: ${new Date(letter.date.seconds * 1000).toLocaleString()}</div>
+      <div>${escapeHTML(letter.body)}</div>
+    </div>
+  `).join('');
+}
+
+function renderArchivePage(page = 1) {
+  const archiveLettersList = document.getElementById("archiveLettersList");
+  const archivePagination = document.getElementById("archivePagination");
+
+  const start = (page - 1) * lettersPerPage;
+  const end = start + lettersPerPage;
+  const pageLetters = allPublicLetters.slice(start, end);
+
+  if (pageLetters.length === 0) {
+    archiveLettersList.innerHTML = "<p>No letters found.</p>";
+    archivePagination.innerHTML = "";
+    return;
+  }
+
+  archiveLettersList.innerHTML = pageLetters.map(letter => `
+    <div class="letter-archive" style="margin-bottom:1rem; border-bottom:1px solid #ccc; padding:1rem;">
+      <div><strong>From:</strong> ${letter.anonymous ? "Anonymous" : escapeHTML(letter.fromName || "(No name)")}</div>
+      <div><strong>Sent:</strong> ${new Date(letter.date.seconds * 1000).toLocaleString()}</div>
+      <div>${escapeHTML(letter.body)}</div>
+    </div>
+  `).join('');
+
+  const totalPages = Math.ceil(allPublicLetters.length / lettersPerPage);
+  let paginationHTML = "";
+  if (page > 1) paginationHTML += `<button id="prevPageBtn" style="margin-right:10px;">Previous</button>`;
+  if (page < totalPages) paginationHTML += `<button id="nextPageBtn">Next</button>`;
+  archivePagination.innerHTML = paginationHTML;
+
+  document.getElementById("prevPageBtn")?.addEventListener("click", () => {
+    currentPage--;
+    renderArchivePage(currentPage);
+  });
+  document.getElementById("nextPageBtn")?.addEventListener("click", () => {
+    currentPage++;
+    renderArchivePage(currentPage);
+  });
+}
+
+// Open modal and load archive letters
+document.getElementById("viewAllLettersBtn").addEventListener("click", () => {
+  currentPage = 1;
+  renderArchivePage(currentPage);
+  document.getElementById("archiveModal").style.display = "block";
+});
+
+// Close modal
+document.getElementById("closeArchiveBtn").addEventListener("click", () => {
+  document.getElementById("archiveModal").style.display = "none";
+});
+
+// Close modal if clicking outside content
+document.getElementById("archiveModal").addEventListener("click", e => {
+  if (e.target.id === "archiveModal") {
+    document.getElementById("archiveModal").style.display = "none";
+  }
+});
+
+// Utility escape function
+function escapeHTML(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// Load on page start
+loadLetters();
+
 // Your Spotify playlist embed links
 const playlists = [
   "https://open.spotify.com/embed/playlist/20cFhdWIRJkwdz8htMsqpL?utm_source=generator",
