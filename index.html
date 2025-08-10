@@ -631,14 +631,37 @@ footer {
     });
   });
 
-  // Initial states
-  fromNameInput.disabled = anonymousCheckbox.checked;
-  renderLetters();
+ // Initial states
+fromNameInput.disabled = anonymousCheckbox.checked;
+renderLetters();
 
-  // If URL hash is chatSection, show chat
-  if(window.location.hash === "#chatSection") {
-    chatSection.style.display = "block";
-  }
+// 🎵 Spotify playlist embed links
+const playlists = [
+  "https://open.spotify.com/embed/playlist/20cFhdWIRJkwdz8htMsqpL?utm_source=generator",
+  "https://open.spotify.com/embed/playlist/0DHpuDG6eZUon4AMPS8IMH?utm_source=generator",
+  "https://open.spotify.com/embed/playlist/16c05mCV8p0XHqVf9Gy1wG?utm_source=generator",
+  "https://open.spotify.com/embed/playlist/0xjsfnfmYY8GIKeSLo9raO?utm_source=generator",
+  "https://open.spotify.com/embed/playlist/5xth5vDRLEc6KFt5ppjaQg?utm_source=generator"
+];
+
+// Pick one playlist randomly
+const randomPlaylist = playlists[Math.floor(Math.random() * playlists.length)];
+
+// Create iframe and add it to the page (below letters list)
+const playlistContainer = document.createElement("div");
+playlistContainer.innerHTML = `
+  <iframe style="border-radius:12px" 
+          src="${randomPlaylist}" 
+          width="100%" height="380" frameBorder="0" 
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+          loading="lazy"></iframe>
+`;
+lettersList.parentElement.appendChild(playlistContainer);
+
+// If URL hash is chatSection, show chat
+if (window.location.hash === "#chatSection") {
+  chatSection.style.display = "block";
+}
 
 </script>
 
