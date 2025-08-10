@@ -292,6 +292,49 @@ footer {
   margin-top: 15px;
   color: var(--meta-text);
 }
+
+/* Archive modal styles */
+#archiveModal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.8);
+  overflow-y: auto;
+  padding: 2rem;
+  z-index: 1000;
+  font-family: Arial, sans-serif;
+}
+
+#closeArchiveBtn {
+  position: fixed;
+  top: 1rem; right: 1rem;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  line-height: 1;
+}
+
+#archiveModal h2 {
+  color: white;
+  margin-bottom: 1rem;
+}
+
+#archiveLettersList {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 700px;
+  margin: auto;
+}
+
+#archivePagination {
+  text-align: center;
+  margin-top: 1rem;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   main {
@@ -303,7 +346,7 @@ footer {
 <body>
 
 <header>
-  <h1>Anonymous Letters</h1>
+  <h1>Signed Anon</h1>
   <nav>
     <a href="#submitSection">Home</a>
     <a href="#chatSection">Chat</a>
@@ -319,7 +362,7 @@ footer {
     <h2>Send a Letter</h2>
     <form id="letterForm">
       <textarea id="letterBody" placeholder="Write your letter..."></textarea>
-      
+
       <label>
         <input type="checkbox" id="anonymous" checked /> Send anonymously
       </label>
@@ -337,9 +380,26 @@ footer {
 
   <section id="lettersSection">
     <h2>Public Letters</h2>
-    <div id="lettersList">
-      <p>No letters yet. Be the first!</p>
-    </div>
+    <div id="lettersSection">
+  <div id="lettersList"></div>
+  <button id="viewAllLettersBtn" style="
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: none;
+    background-color: #2db954;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  ">View All Letters</button>
+      <!-- Archive Modal -->
+<div id="archiveModal">
+  <button id="closeArchiveBtn">&times;</button>
+  <h2>All Letters Archive</h2>
+  <div id="archiveLettersList"></div>
+  <div id="archivePagination"></div>
+</div>
   </section>
 
   <section id="chatSection" style="display:none;">
@@ -696,6 +756,91 @@ form.addEventListener("submit", () => {
 if (window.location.hash === "#chatSection") {
   chatSection.style.display = "block";
 }
+const viewAllBtn = document.getElementById("viewAllLettersBtn");
+const archiveModal = document.getElementById("archiveModal");
+const closeArchiveBtn = document.getElementById("closeArchiveBtn");
+const archiveLettersList = document.getElementById("archiveLettersList");
+const archivePagination = document.getElementById("archivePagination");
+
+const lettersPerPage = 10;
+let currentPage = 1;
+let allLetters = [];
+
+async function loadAllLetters() {
+  try {
+    const q = query(collection(db, "publicLetters"), orderBy("date", "desc"));
+    const querySnapshot = await getDocs(q);
+    allLetters = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+  } catch (error) {
+    archiveLettersList.innerHTML = `<p style="color: red;">Failed to load letters.</p>`;
+    console.error(error);
+  }
+}
+
+function renderArchivePage(page = 1) {
+  archiveLettersList.innerHTML = "";
+  const start = (page - 1) * lettersPerPage;
+  const end = start + lettersPerPage;
+  const pageLetters = allLetters.slice(start, end);
+
+  if (pageLetters.length === 0) {
+    archiveLettersList.innerHTML = "<p>No letters found.</p>";
+    archivePagination.innerHTML = "";
+    return;
+  }
+
+  pageLetters.forEach(letter => {
+    const letterHTML = `
+      <div class="letter-archive" style="margin-bottom: 1rem; padding: 1rem; border-bottom: 1px solid #ccc;">
+        <div><strong>From:</strong> ${letter.anonymous ? "Anonymous" : escapeHTML(letter.fromName || "(No name)")}</div>
+        <div><strong>Sent:</strong> ${new Date(letter.date.seconds * 1000).toLocaleString()}</div>
+        <div>${escapeHTML(letter.body)}</div>
+      </div>
+    `;
+    archiveLettersList.insertAdjacentHTML("beforeend", letterHTML);
+  });
+
+  // Pagination buttons
+  const totalPages = Math.ceil(allLetters.length / lettersPerPage);
+  let paginationHTML = "";
+  if (page > 1) paginationHTML += `<button id="prevPageBtn" style="margin-right:10px; padding: 0.3rem 0.7rem;">Previous</button>`;
+  if (page < totalPages) paginationHTML += `<button id="nextPageBtn" style="padding: 0.3rem 0.7rem;">Next</button>`;
+  archivePagination.innerHTML = paginationHTML;
+
+  // Add event listeners
+  const prevBtn = document.getElementById("prevPageBtn");
+  const nextBtn = document.getElementById("nextPageBtn");
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      currentPage--;
+      renderArchivePage(currentPage);
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      currentPage++;
+      renderArchivePage(currentPage);
+    });
+  }
+}
+
+viewAllBtn.addEventListener("click", async () => {
+  await loadAllLetters();
+  currentPage = 1;
+  renderArchivePage(currentPage);
+  archiveModal.style.display = "block";
+});
+
+closeArchiveBtn.addEventListener("click", () => {
+  archiveModal.style.display = "none";
+});
+
+// Close modal if clicking outside the white box
+archiveModal.addEventListener("click", e => {
+  if (e.target === archiveModal) {
+    archiveModal.style.display = "none";
+  }
+});
 
 </script>
 
