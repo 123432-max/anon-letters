@@ -6,7 +6,6 @@
   <title>Signed Anonymous Letters</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
-    /* Paste the entire pastel CSS here */
     :root {
       --bg-color: #fef6f9;
       --text-color: #3b3a4f;
@@ -22,9 +21,6 @@
       --meta-text: #6c757d;
       --popup-bg: rgba(200, 200, 200, 0.3);
       --popup-content-bg: #ffffff;
-      --chat-bg: #f1f1f9;
-      --input-bg: #ffffff;
-      --input-border: #d1d1e9;
       --shadow-light: rgba(0, 0, 0, 0.1);
     }
     body {
@@ -53,9 +49,6 @@
       --meta-text: #b6c1ba;
       --popup-bg: rgba(0, 0, 0, 0.7);
       --popup-content-bg: #354f52;
-      --chat-bg: #52796f;
-      --input-bg: #6b8e72;
-      --input-border: #84a98c;
       --shadow-light: rgba(255, 255, 255, 0.1);
     }
     header {
@@ -144,8 +137,8 @@
       padding: 14px 18px;
       font-size: 15px;
       border-radius: 14px;
-      border: 1.8px solid var(--input-border);
-      background: var(--input-bg);
+      border: 1.8px solid #d1d1e9;
+      background: var(--letter-bg);
       color: var(--text-color);
       resize: vertical;
       transition: border-color 0.3s ease;
@@ -192,6 +185,8 @@
       box-shadow: 0 8px 15px var(--shadow-light);
       cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.25s ease;
+      white-space: pre-wrap;
+      user-select: text;
     }
     .letter:hover {
       transform: translateY(-3px);
@@ -215,47 +210,6 @@
       border-top: 1.5px solid #eee;
       padding-top: 18px;
     }
-    .reactions {
-      margin-top: 12px;
-      display: flex;
-      gap: 22px;
-    }
-    .react-btn {
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-color);
-      transition: color 0.3s ease;
-      padding: 6px 12px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 15px;
-      user-select: none;
-    }
-    .react-btn:hover {
-      background-color: rgba(255, 180, 162, 0.3);
-    }
-    .react-btn .icon {
-      stroke: currentColor;
-      fill: none;
-      transition: fill 0.3s ease, stroke 0.3s ease;
-    }
-    .react-btn.active .icon {
-      fill: currentColor;
-      stroke: currentColor;
-    }
-    .react-btn[data-type="like"].active {
-      color: #ffd6d6;
-    }
-    .react-btn[data-type="love"].active {
-      color: #ff8a75;
-    }
-    .react-btn[data-type="laugh"].active {
-      color: #ffd166;
-    }
     /* Popup styling */
     .popup {
       display: none;
@@ -270,12 +224,18 @@
       background: var(--popup-content-bg);
       padding: 24px 32px;
       border-radius: 18px;
-      max-width: 440px;
+      max-width: 460px;
       box-sizing: border-box;
       position: relative;
       color: var(--text-color);
       font-weight: 500;
       box-shadow: 0 15px 35px var(--shadow-light);
+      max-height: 75vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 16px;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
     }
     .close-btn {
       position: absolute;
@@ -291,76 +251,6 @@
     .close-btn:hover {
       color: var(--button-bg);
     }
-    #letterModalContent {
-      max-width: 460px;
-      max-height: 75vh;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      font-size: 16px;
-      line-height: 1.5;
-      padding-top: 10px;
-      letter-spacing: 0.02em;
-    }
-    /* Chat */
-    #chatMessages {
-      max-height: 340px;
-      overflow-y: auto;
-      background: var(--chat-bg);
-      border-radius: 18px;
-      padding: 16px 20px;
-      box-shadow: inset 0 0 15px var(--shadow-light);
-      font-size: 15px;
-      color: var(--text-color);
-      user-select: text;
-      letter-spacing: 0.02em;
-    }
-    .chat-message {
-      margin-bottom: 14px;
-    }
-    .chat-message .sender {
-      font-weight: 600;
-      color: var(--button-bg);
-      margin-right: 6px;
-      letter-spacing: 0.02em;
-    }
-    .chat-input-group {
-      display: flex;
-      margin-top: 14px;
-    }
-    #chatInput {
-      flex-grow: 1;
-      padding: 14px 20px;
-      border-radius: 18px 0 0 18px;
-      border: 1.8px solid var(--input-border);
-      font-size: 15px;
-      color: var(--text-color);
-      background: var(--input-bg);
-      resize: none;
-      font-weight: 400;
-      transition: border-color 0.3s ease;
-    }
-    #chatInput:focus {
-      outline: none;
-      border-color: var(--button-bg);
-      box-shadow: 0 0 10px var(--button-bg);
-    }
-    #chatSendBtn {
-      background: var(--button-bg);
-      border: none;
-      color: white;
-      font-weight: 700;
-      padding: 14px 22px;
-      cursor: pointer;
-      border-radius: 0 18px 18px 0;
-      box-shadow: 0 4px 12px var(--button-bg);
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      user-select: none;
-    }
-    #chatSendBtn:hover {
-      background-color: var(--button-hover-bg);
-      transform: scale(1.05);
-    }
-
     /* Responsive tweaks */
     @media (max-width: 480px) {
       main {
@@ -462,4 +352,111 @@
     <div class="popup-content" id="letterModalContent">
       <span class="close-btn" id="closeLetterModal">&times;</span>
       <div id="letterDetailMeta" class="meta"></div>
-      <div
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+    import { getDatabase, ref, onChildAdded, push } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKoB-MttFzBvxONoG8mHWvxQyAJCHH2kU",
+      authDomain: "signed-anon.firebaseapp.com",
+      projectId: "signed-anon",
+      storageBucket: "signed-anon.firebasestorage.app",
+      messagingSenderId: "786490639449",
+      appId: "1:786490639449:web:cbc7a80e9b0cb0d6141d48",
+      measurementId: "G-W6WH1KD5YQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const lettersRef = ref(db, 'letters');
+    const lettersList = document.getElementById('lettersList');
+
+    // Form elements
+    const letterForm = document.getElementById('letterForm');
+    const fromNameInput = document.getElementById('fromName');
+    const anonymousCheckbox = document.getElementById('anonymousCheckbox');
+    const bodyInput = document.getElementById('body');
+    const publicShareCheckbox = document.getElementById('publicShareCheckbox');
+
+    // Modals
+    const aboutModal = document.getElementById('aboutModal');
+    const aboutLink = document.getElementById('aboutLink');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    const letterModal = document.getElementById('letterModal');
+    const letterModalContent = document.getElementById('letterModalContent');
+    const closeLetterModalBtn = document.getElementById('closeLetterModal');
+    const letterDetailMeta = document.getElementById('letterDetailMeta');
+
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if(localStorage.getItem('darkMode') === 'enabled') {
+      document.body.classList.add('dark-mode');
+      darkModeToggle.checked = true;
+    }
+
+    darkModeToggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+    });
+
+    // About modal open/close
+    aboutLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      aboutModal.style.display = 'flex';
+    });
+    closeModalBtn.addEventListener('click', () => {
+      aboutModal.style.display = 'none';
+    });
+    window.addEventListener('click', e => {
+      if (e.target === aboutModal) aboutModal.style.display = 'none';
+      if (e.target === letterModal) letterModal.style.display = 'none';
+    });
+
+    // Listen for letters
+    onChildAdded(lettersRef, (snapshot) => {
+      const letter = snapshot.val();
+      if (!letter.public) return; // Only show public letters
+
+      const letterDiv = document.createElement('div');
+      letterDiv.className = 'letter';
+      letterDiv.textContent = letter.body.length > 120 ? letter.body.slice(0, 120) + '...' : letter.body;
+
+      letterDiv.addEventListener('click', () => {
+        letterModal.style.display = 'flex';
+        letterModalContent.textContent = letter.body;
+        letterDetailMeta.textContent = `From: ${letter.anonymous ? 'Anonymous' : (letter.fromName || 'Unknown')}`;
+      });
+
+      lettersList.appendChild(letterDiv);
+    });
+
+    // Submit letter
+    letterForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const fromName = anonymousCheckbox.checked ? null : fromNameInput.value.trim();
+      const body = bodyInput.value.trim();
+      const isPublic = publicShareCheckbox.checked;
+
+      if (!body) return alert('Please write a letter.');
+
+      push(lettersRef, {
+        fromName: fromName || null,
+        anonymous: anonymousCheckbox.checked,
+        body,
+        public: isPublic,
+        timestamp: Date.now()
+      }).then(() => {
+        bodyInput.value = '';
+        fromNameInput.value = '';
+        anonymousCheckbox.checked = false;
+        publicShareCheckbox.checked = true;
+      }).catch(err => alert('Error sending letter: ' + err.message));
+    });
+  </script>
+</body>
+</html>
