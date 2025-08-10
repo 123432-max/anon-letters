@@ -1,320 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Anonymous Letters</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
-
-  body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    font-family: 'Montserrat', sans-serif;
-    color: #f0f0f5;
-    margin: 0;
-    padding: 20px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  h1 {
-    font-weight: 600;
-    margin-bottom: 10px;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  }
-
-  /* Fade-in animation */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(15px);
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0; padding: 0;
+        background: #f0f2f5;
+        display: flex; flex-direction: column; align-items: center;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+    header {
+        width: 100%;
+        background: #4CAF50;
+        color: white;
+        padding: 15px;
+        display: flex; justify-content: space-between; align-items: center;
     }
-  }
-
-  #aboutBtn {
-    margin: 15px auto 30px auto;
-    padding: 8px 18px;
-    font-weight: 600;
-    border-radius: 8px;
-    border: none;
-    background: #ff6f91;
-    color: white;
-    cursor: pointer;
-    display: block;
-    max-width: 600px;
-    width: 100%;
-    box-shadow: 0 6px 12px rgba(255,111,145,0.6);
-    transition: background-color 0.3s ease;
-  }
-  #aboutBtn:hover {
-    background-color: #ff3d68;
-  }
-
-  #aboutBtn:active {
-    transform: scale(0.96);
-    transition: transform 0.1s ease;
-  }
-
-  .letters {
-    animation: fadeInUp 0.6s ease forwards;
-    max-width: 600px;
-    width: 100%;
-    margin-top: 40px;
-    background: #1e1e3f;
-    border-radius: 14px;
-    padding: 20px;
-    box-sizing: border-box;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-  }
-
-  form {
-    background: #2c2c54;
-    padding: 25px;
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    max-width: 600px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  textarea {
-    width: 100%;
-    height: 130px;
-    padding: 12px;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: none;
-    resize: vertical;
-    outline: none;
-    font-family: 'Montserrat', sans-serif;
-    box-sizing: border-box;
-  }
-
-  label {
-    display: block;
-    margin-top: 12px;
-    font-weight: 600;
-    user-select: none;
-  }
-
-  input[type="text"] {
-    width: 100%;
-    margin-top: 8px;
-    padding: 10px;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    box-sizing: border-box;
-  }
-
-  button {
-    margin-top: 18px;
-    padding: 12px 25px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 10px;
-    background: #ff6f91;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 6px 12px rgba(255,111,145,0.6);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
-  }
-
-  button:hover {
-    background: #ff3d68;
-    box-shadow: 0 8px 16px rgba(255,61,104,0.8);
-  }
-
-  button:active {
-    transform: scale(0.96);
-  }
-
-  .letter {
-    background: #3a3a72;
-    padding: 15px 20px;
-    margin-bottom: 18px;
-    border-radius: 12px;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-    white-space: pre-wrap;
-    color: #f0f0f5;
-  }
-
-  .meta {
-    font-size: 0.8rem;
-    color: #d3d3d3;
-    margin-bottom: 8px;
-    user-select: none;
-  }
-
-  footer {
-    margin-top: auto;
-    padding: 15px 0;
-    color: #bbb;
-    font-size: 0.8rem;
-    text-align: center;
-    user-select: none;
-  }
-
-  /* Disable name input when anonymous checked */
-  #fromName:disabled {
-    background: #555577;
-    color: #aaa;
-  }
-
-  /* Modal styles */
-  #aboutModal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    align-items: center;
-    justify-content: center;
-  }
-
-  #aboutModal > div {
-    background: #2c2c54;
-    padding: 25px 30px;
-    border-radius: 14px;
-    max-width: 500px;
-    margin: 20px;
-    color: #ddd;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    position: relative;
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-
-  #closeModal {
-    position: absolute;
-    top: 12px;
-    right: 14px;
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    color: #ff6f91;
-    cursor: pointer;
-    font-weight: 700;
-    user-select: none;
-  }
+    header h1 { margin: 0; font-size: 1.2em; }
+    nav a { color: white; text-decoration: none; margin-left: 15px; }
+    main { max-width: 600px; width: 100%; padding: 20px; }
+    textarea {
+        width: 100%; height: 120px; padding: 10px; font-size: 14px;
+        border: 1px solid #ccc; border-radius: 8px; resize: none;
+    }
+    label { display: block; margin: 10px 0; }
+    button {
+        background: #4CAF50; color: white;
+        padding: 10px 20px; border: none;
+        border-radius: 8px; cursor: pointer;
+    }
+    .letter {
+        background: white; padding: 15px; border-radius: 8px;
+        margin: 10px 0; box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    footer {
+        margin-top: 20px; padding: 10px; font-size: 12px; color: #666;
+    }
+    /* Popup styles */
+    .popup {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); justify-content: center; align-items: center;
+    }
+    .popup-content {
+        background: white; padding: 20px; border-radius: 8px; width: 80%; max-width: 400px;
+    }
+    .close-btn {
+        float: right; cursor: pointer; font-weight: bold; font-size: 18px;
+    }
 </style>
 </head>
 <body>
 
-<h1>Anonymous Letters</h1>
+<header>
+    <h1>Anonymous Letters</h1>
+    <nav>
+        <a href="#" id="aboutBtn">About</a>
+    </nav>
+</header>
 
-<button id="aboutBtn">About</button>
+<main>
+    <textarea id="letterInput" placeholder="Write your letter..."></textarea>
+    <label>
+        <input type="checkbox" id="publicCheck"> Share publicly
+    </label>
+    <button onclick="sendLetter()">Send</button>
 
-<form id="letterForm">
-  <textarea id="letterBody" placeholder="Write your letter here..." required></textarea>
-  <label><input type="checkbox" id="anonymous" checked /> Send anonymously</label>
-  <input type="text" id="fromName" placeholder="Your name (optional)" />
-  <button type="submit">Send Letter</button>
-</form>
+    <h3>Public Letters</h3>
+    <div id="publicLetters"></div>
+</main>
 
-<div class="letters" id="lettersContainer">
-  <h2>Letters</h2>
-  <div id="lettersList"></div>
+<footer>
+    by planetvenus — jk feel free to share thoughts everyone!<br>
+    <small>ps. iykyk this is for ;)</small>
+</footer>
+
+<!-- About Popup -->
+<div class="popup" id="aboutPopup">
+    <div class="popup-content">
+        <span class="close-btn" id="closePopup">&times;</span>
+        <h2>About This Site</h2>
+        <p>This is a safe space for sharing anonymous or public letters. Be kind, respectful, and have fun.</p>
+    </div>
 </div>
 
-<footer>by planetvenus</footer>
-
-<!-- Modal -->
-<div id="aboutModal">
-  <div>
-    <button id="closeModal">&times;</button>
-    <p>Welcome! This site lets you write and share letters anonymously or signed. It’s perfect for honest thoughts, secret messages, or just random notes.</p>
-    <p>Feel free to write your letter and read others. All messages are stored locally on your device and won’t be shared externally.</p>
-    <p>jk feel free to share thoughts everyone!</p>
-    <p><em>ps. iykyk this is for ;)</em></p>
-  </div>
-</div>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
 <script>
-  const form = document.getElementById('letterForm');
-  const lettersList = document.getElementById('lettersList');
-  const anonymousCheckbox = document.getElementById('anonymous');
-  const fromNameInput = document.getElementById('fromName');
+    // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-  function saveLetters(letters) {
-    localStorage.setItem('anonLetters', JSON.stringify(letters));
-  }
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBKoB-MttFzBvxONoG8mHWvxQyAJCHH2kU",
+  authDomain: "signed-anon.firebaseapp.com",
+  projectId: "signed-anon",
+  storageBucket: "signed-anon.firebasestorage.app",
+  messagingSenderId: "786490639449",
+  appId: "1:786490639449:web:cbc7a80e9b0cb0d6141d48",
+  measurementId: "G-W6WH1KD5YQ"
+};
 
-  function loadLetters() {
-    const data = localStorage.getItem('anonLetters');
-    return data ? JSON.parse(data) : [];
-  }
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
-  function renderLetters() {
-    const letters = loadLetters();
-    lettersList.innerHTML = letters.length ? letters.map(l => `
-      <div class="letter">
-        <div class="meta">From: ${l.anonymous ? 'Anonymous' : l.fromName || '(No Name)'} | Sent: ${new Date(l.date).toLocaleString()}</div>
-        <div>${l.body.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
-      </div>
-    `).join('') : '<p>No letters yet. Be the first!</p>';
-  }
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const body = document.getElementById('letterBody').value.trim();
-    if (!body) return alert('Write something before sending!');
+    async function sendLetter() {
+        const text = document.getElementById("letterInput").value.trim();
+        const isPublic = document.getElementById("publicCheck").checked;
+        if (!text) return alert("Please write something first!");
 
-    const letters = loadLetters();
-    letters.unshift({
-      body,
-      anonymous: anonymousCheckbox.checked,
-      fromName: fromNameInput.value.trim(),
-      date: new Date().toISOString(),
-    });
-
-    saveLetters(letters);
-    renderLetters();
-    form.reset();
-    anonymousCheckbox.checked = true;
-    fromNameInput.disabled = true;
-  });
-
-  // Disable fromName if anonymous is checked
-  anonymousCheckbox.addEventListener('change', () => {
-    fromNameInput.disabled = anonymousCheckbox.checked;
-    if (anonymousCheckbox.checked) fromNameInput.value = '';
-  });
-
-  // Initial render
-  renderLetters();
-  fromNameInput.disabled = true;
-
-  // About modal controls
-  const aboutBtn = document.getElementById('aboutBtn');
-  const aboutModal = document.getElementById('aboutModal');
-  const closeModal = document.getElementById('closeModal');
-
-  aboutBtn.addEventListener('click', () => {
-    aboutModal.style.display = 'flex';
-  });
-
-  closeModal.addEventListener('click', () => {
-    aboutModal.style.display = 'none';
-  });
-
-  // Close modal if user clicks outside the content box
-  aboutModal.addEventListener('click', e => {
-    if (e.target === aboutModal) {
-      aboutModal.style.display = 'none';
+        if (isPublic) {
+            await db.collection("publicLetters").add({
+                text,
+                timestamp: new Date()
+            });
+        }
+        document.getElementById("letterInput").value = "";
+        document.getElementById("publicCheck").checked = false;
+        loadPublicLetters();
     }
-  });
+
+    async function loadPublicLetters() {
+        const container = document.getElementById("publicLetters");
+        container.innerHTML = "";
+        const snapshot = await db.collection("publicLetters").orderBy("timestamp", "desc").get();
+        snapshot.forEach(doc => {
+            const div = document.createElement("div");
+            div.className = "letter";
+            div.textContent = doc.data().text;
+            container.appendChild(div);
+        });
+    }
+
+    loadPublicLetters();
+
+    // About popup
+    document.getElementById("aboutBtn").onclick = () => {
+        document.getElementById("aboutPopup").style.display = "flex";
+    };
+    document.getElementById("closePopup").onclick = () => {
+        document.getElementById("aboutPopup").style.display = "none";
+    };
+    window.onclick = e => {
+        if (e.target === document.getElementById("aboutPopup")) {
+            document.getElementById("aboutPopup").style.display = "none";
+        }
+    };
+</script>
+
+<!-- Live Chat Widget -->
+<script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+        s1.async=true;
+        s1.src='https://embed.tawk.to/YOUR_TAWKTO_ID/1gxxxxxxx';
+        s1.charset='UTF-8';
+        s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
+    })();
 </script>
 
 </body>
-  </html>
-  
+</html>
